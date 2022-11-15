@@ -27,34 +27,37 @@ class Jet:
         self.moving_up = False
         self.moving_down = False
 
+    def move_jet(self):
+        """Ques the horizontal and vertical movements, so they happen nearly simultaneously"""
+        self.fly_right()
+        self.increase_altitude()
+        self.decrease_altitude()
     def fly_right(self):
         """Method that will move the jet rightward on the screen"""
-        jet_speed = 1.0
+        jet_speed = 1.0 #Later move to settings
         # Check if the jet is at the right edge, if it is reset to the left side before flying right
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
         else:
             self.rect.x += jet_speed
-            self.increase_altitude()
-            self.decrease_altitude()
-
     def increase_altitude(self):
         """This will increase the altitude of the jet"""
         # Only increase altitude when not at top of screen
-        jet_speed = 10.0
+        jet_speed_up = 1.0 #Later move to settings
         if self.rect.y > 0 and self.moving_up:
-            self.rect.y -= jet_speed
+            self.rect.y -= jet_speed_up
 
     def decrease_altitude(self):
         """This will decrease the altitude of the jet"""
         # Only decrease if not below bottom third of screen
-        jet_speed = 10.0
+        jet_speed_down = 1.0 #Later move to settings
         if self.rect.y < self.settings.screen_height * 2/3 and self.moving_down:
-            self.rect.y += jet_speed
+            self.rect.y += jet_speed_down
 
     def _reset_jet(self):
         """Method to return the jet to the left of the screen"""
-        self.rect.x = self.rect.height
+        # Jet is actually drawn in the negative x to give it a smoother effect of coming out of the left margin
+        self.rect.x = 0 - self.rect.width
 
     def blitme(self):
         """This is what will allow the jet to be drawn to the screen when we call from jet fighter game"""

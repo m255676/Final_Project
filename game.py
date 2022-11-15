@@ -2,6 +2,7 @@ import sys
 import pygame
 from jet import Jet
 from settings import Settings
+from ground import Ground
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -17,13 +18,14 @@ class JetFighterGame:
         # Create an instance of the jet class and pass in self
         #   so attributes can be passed into the class to be used by it
         self.jet = Jet(self)
+        self.ground = Ground(self)
 
     def run_game(self):
         """This is the main loop for the game"""
         while True:
             self._check_events()
-            # This will call the jet rightward movement function
-            self.jet.fly_right()
+            # This will call the jet movement function
+            self.jet.move_jet()
             self._update_screen()
 
     def _check_events(self):
@@ -53,8 +55,9 @@ class JetFighterGame:
 
     def _update_screen(self):
         """This method updates the screen"""
-        screen_color = (158, 207, 230)
+        screen_color = (158, 207, 230) #Later move to settings
         self.screen.fill(screen_color)
+        self.ground.draw_ground()
         self.jet.blitme()
         # Makes the most recently drawn screen visible
         pygame.display.flip()
