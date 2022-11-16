@@ -3,6 +3,7 @@ import pygame
 from jet import Jet
 from settings import Settings
 from ground import Ground
+from enemy_tank import Enemy_Tank
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -19,6 +20,7 @@ class JetFighterGame:
         #   so attributes can be passed into the class to be used by it
         self.jet = Jet(self)
         self.ground = Ground(self)
+        self.enemy_tank = Enemy_Tank(self)
 
     def run_game(self):
         """This is the main loop for the game"""
@@ -26,6 +28,7 @@ class JetFighterGame:
             self._check_events()
             # This will call the jet movement function
             self.jet.move_jet()
+            self.enemy_tank.move_tank()
             self._update_screen()
 
     def _check_events(self):
@@ -59,6 +62,7 @@ class JetFighterGame:
         self.screen.fill(screen_color)
         self.ground.draw_ground()
         self.jet.blitme()
+        self.enemy_tank.draw_tank()
         # Makes the most recently drawn screen visible
         pygame.display.flip()
 
