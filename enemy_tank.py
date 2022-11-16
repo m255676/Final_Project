@@ -12,6 +12,7 @@ class Enemy_Tank():
 
         self.image = pygame.image.load('images/tank_images/sample_tank.bmp')
         self.image = pygame.transform.scale(self.image, (60,40))
+        # Still need to mirror tank so that its orriented the right direction
 
         self.rect = self.image.get_rect()
 
