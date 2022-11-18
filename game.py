@@ -20,7 +20,6 @@ class JetFighterGame:
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Jet Fighter Game")
 
-
         self.loop_speed = 100
 
         # Create an instance of the jet class and pass in self
@@ -70,7 +69,7 @@ class JetFighterGame:
     def _update_screen(self):
         """This method updates the screen"""
         screen_color = (158, 207, 230) #Later move to settings
-        #self.screen.fill(screen_color)
+        self.screen.fill(screen_color)
         self.ground.draw_ground()
         self.jet.blitme()
         self.enemy_tank.draw_tank()

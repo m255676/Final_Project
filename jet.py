@@ -17,6 +17,7 @@ class Jet:
         self.image = pygame.transform.scale(self.image, (80,80))
         # Get the Jet's Rect so we can access and work with its dimmensions later
         self.rect = self.image.get_rect()
+        self.height = self.rect.height
 
         # Store a decimal value for the jet's horizontal position
         self.x = float(self.rect.x)
