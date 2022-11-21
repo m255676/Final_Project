@@ -1,10 +1,12 @@
 import pygame
+from pygame.sprite import Sprite
 
-class Enemy_Tank():
+class Enemy_Tank(Sprite):
     """Overall class to manage enemy tank attributes and actions"""
 
     def __init__(self, jet_fighter_game):
         """Initialize enemy tank by passing in screen dimensions used in game"""
+        super().__init__()
         self.screen = jet_fighter_game.screen
         self.screen_width = jet_fighter_game.settings.screen_width
         self.screen_height = jet_fighter_game.settings.screen_height

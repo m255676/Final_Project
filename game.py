@@ -15,7 +15,6 @@ class JetFighterGame:
         """Initialize the game, and create game resources"""
         pygame.init()
         self.clock = pygame.time.Clock()
-
         self.settings = Settings()
 
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
@@ -26,37 +25,33 @@ class JetFighterGame:
         self.loop_speed = 100
         self.counter = 0
 
-        # Create an instance of the jet class and pass in self
-        #   so attributes can be passed into the class to be used by it
         self.jet = Jet(self)
         self.ground = Ground(self)
-
-        #self.enemy_tank = Enemy_Tank(self)
-
         self.bombs = pygame.sprite.Group()
-        self.tanks = pygame.sprite.Group()
+        self.enemy_tanks = pygame.sprite.Group()
 
     def run_game(self):
         """This is the main loop for the game"""
-
+        # Need to make an instance of the first tank to run before the counter starts making new tanks
+        first_tank = Enemy_Tank(self)
+        self.enemy_tanks.add(first_tank)
         while True:
+            # Check for any key events
             self._check_events()
             # This will call the jet movement function
             self.jet.move_jet()
-            # Moves first tank
-            #self.enemy_tank.move_tank()
-            # Makes a new tank after a certain time
-            #self._make_new_tanks()
-            # Move every tank in our sprite group
-            #self.tanks.update()
-            # Move every bomb in our sprite group
+            # This will update the bombs in our sprite group
             self.bombs.update()
-
-            self._update_screen()
-            # Control FPS
-            self.clock.tick(self.loop_speed)
+            # This will move the tanks
+            self.enemy_tanks.update()
             # Track Time using a counter
             self.counter += 1
+            if (self.counter % 500 == 0):
+                self._make_new_tanks()
+            # Control FPS
+            self.clock.tick(self.loop_speed)
+
+            self._update_screen()
 
     def _check_events(self):
         """This method responds to key events"""
@@ -79,7 +74,6 @@ class JetFighterGame:
         elif event.key == pygame.K_SPACE:
             self._drop_bomb()
 
-
     def _check_keyup_events(self, event):
         if event.key == pygame.K_UP:
             self.jet.moving_up = False
@@ -88,10 +82,10 @@ class JetFighterGame:
 
     def _make_new_tanks(self):
         """After counter hits target number/ after desired elapsed time, make a new tank"""
-        if (self.counter % 10000 == 0):
-            new_tank = Enemy_Tank(self)
-            self.tanks.add(new_tank)
-            self.counter = 0
+        new_enemy_tank = Enemy_Tank(self)
+        self.enemy_tanks.add(new_enemy_tank)
+        self.counter = 0
+
     def _drop_bomb(self):
         """Create a new bomb and add it to the Sprite group"""
         new_bomb = Bomb(self)
@@ -99,24 +93,15 @@ class JetFighterGame:
 
     def _update_screen(self):
         """This method updates the screen"""
-        #screen_color = (158, 207, 230) #Later move to settings
         self.screen.blit(self.back_ground, (0,0))
         self.ground.draw_ground()
         self.jet.blitme()
-        #self.enemy_tank.draw_tank()
-        #for tank in self.tanks.sprites():
-            #tank.draw_tank()
+        for enemey_tank in self.enemy_tanks.sprites():
+            enemey_tank.draw_tank()
         for bomb in self.bombs.sprites():
             bomb.draw_bomb()
         # Makes the most recently drawn screen visible
         pygame.display.flip()
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
