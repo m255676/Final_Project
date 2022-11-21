@@ -21,6 +21,12 @@ class Enemy_Tank():
 
         self.rect.x = self.start_pos_x
 
+        self.counter = jet_fighter_game.counter
+
+    def update(self):
+        """Move Tanks - Later will house the shooting methods"""
+        self.move_tank()
+
     def move_tank(self):
         """Function to move tank"""
         self.rect.x -= 1.0

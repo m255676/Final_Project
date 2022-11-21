@@ -35,7 +35,7 @@ class Jet:
         self.decrease_altitude()
     def fly_right(self):
         """Method that will move the jet rightward on the screen"""
-        jet_speed = 1.0 #Later move to settings
+        jet_speed = 3.0 #Later move to settings
         # Check if the jet is at the right edge, if it is reset to the left side before flying right
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
