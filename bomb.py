@@ -53,7 +53,7 @@ class Bomb(Sprite):
         """Insert Explosion image if bomb hits ground"""
         if self.rect.y + self.rect.height >= self.settings.screen_height - self.settings.ground_height:
             self.image = pygame.image.load('images/bomb_images/better_explosion.bmp')
-            self.image = pygame.transform.scale(self.image, (60,60))
+            self.image = pygame.transform.scale(self.image, (100,100))
 
     #def _check_tank_collision(self):
     def update(self):
