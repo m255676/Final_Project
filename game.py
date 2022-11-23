@@ -5,12 +5,12 @@ from settings import Settings
 from ground import Ground
 from enemy_tank import Enemy_Tank
 from bomb import Bomb
+from enemy_jet import Enemy_Jet
 import time
 import math
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
-
     def __init__(self):
         """Initialize the game, and create game resources"""
         pygame.init()
@@ -26,7 +26,9 @@ class JetFighterGame:
         self.counter = 0
 
         self.jet = Jet(self)
+        self.enemy_jet = Enemy_Jet(self)
         self.ground = Ground(self)
+
         self.bombs = pygame.sprite.Group()
         self.enemy_tanks = pygame.sprite.Group()
 
@@ -40,17 +42,20 @@ class JetFighterGame:
             self._check_events()
             # This will call the jet movement function
             self.jet.move_jet()
-            # This will update the bombs in our sprite group
-            self.bombs.update()
+            self.enemy_jet.flight(self.counter)
+            # Check if there have been any collisions
+            self._check_any_collisions()
             # This will move the tanks
             self.enemy_tanks.update()
+            # This will update the bombs in our sprite group
+            self.bombs.update()
             # Track Time using a counter
             self.counter += 1
             if (self.counter % 500 == 0):
                 self._make_new_tanks()
             # Control FPS
             self.clock.tick(self.loop_speed)
-
+            # Update Screen
             self._update_screen()
 
     def _check_events(self):
@@ -84,18 +89,24 @@ class JetFighterGame:
         """After counter hits target number/ after desired elapsed time, make a new tank"""
         new_enemy_tank = Enemy_Tank(self)
         self.enemy_tanks.add(new_enemy_tank)
-        self.counter = 0
 
     def _drop_bomb(self):
         """Create a new bomb and add it to the Sprite group"""
         new_bomb = Bomb(self)
         self.bombs.add(new_bomb)
+    def _check_any_collisions(self):
+        """Check for any bomb-tank, tank-plane, plane-plane, bomb-ground collisions and respond respectively"""
+        # Delete bomb and tank after collision
+        collision = pygame.sprite.groupcollide(self.bombs, self.enemy_tanks, True, True)
+        if collision:
+            print("Collision Test")
 
     def _update_screen(self):
         """This method updates the screen"""
         self.screen.blit(self.back_ground, (0,0))
-        self.ground.draw_ground()
+        self.ground.blitme()
         self.jet.blitme()
+        self.enemy_jet.blitme()
         for enemey_tank in self.enemy_tanks.sprites():
             enemey_tank.draw_tank()
         for bomb in self.bombs.sprites():

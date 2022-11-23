@@ -12,10 +12,9 @@ class Bomb(Sprite):
         super().__init__()
         self.settings = jet_fighter_game.settings
         self.screen = jet_fighter_game.screen
-        #self.clcok = pygame.time.Clock()
 
         self.image = pygame.image.load('images/bomb_images/better_bomb.bmp')
-        self.image = pygame.transform.scale(self.image, (60, 60))
+        self.image = pygame.transform.scale(self.image, (45, 45))
         self.rect = self.image.get_rect()
 
         self.start_pos_x = jet_fighter_game.jet.rect.x
@@ -35,12 +34,11 @@ class Bomb(Sprite):
         # As drag constant increases the distance bomb travels in x increases over time
         # This is inverse what you would expect from a drag constant
         self.drag = .04
+        # Redefining self.rect input here using pygame.Rect so spritecollideany function will work
+        self.rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
 
     def free_fall(self):
         """Update the self.rect.x and y to create free fall effect"""
-
-        self._check_ground_collision()
-        #self._check_tank_collision()
         self.rect.x += self.bomb_horizontal_speed
         self.bomb_horizontal_speed += self.drag * self.bomb_vertical_speed
         self.rect.y += self.bomb_vertical_speed**2
@@ -48,18 +46,23 @@ class Bomb(Sprite):
 
         self.rect.x = int(self.rect.x)
         self.rect.y = int(self.rect.y)
+    def _check_any_collisions(self):
+        """All bomb collision checks"""
+        self._check_ground_collision()
 
     def _check_ground_collision(self):
-        """Insert Explosion image if bomb hits ground"""
-        if self.rect.y + self.rect.height >= self.settings.screen_height - self.settings.ground_height:
+        """Insert Explosion image if bomb hits ground and delete bomb"""
+        # Threw in arbitrary number at end of equation to try and account for tanks being offset on ground for 3d effect
+        if self.rect.y + self.rect.height >= self.settings.screen_height - self.settings.ground_height + 20:
+            # Once bomb hits the ground 'explode'
             self.image = pygame.image.load('images/bomb_images/better_explosion.bmp')
-            self.image = pygame.transform.scale(self.image, (100,100))
+            self.image = pygame.transform.scale(self.image, (100, 100))
 
-    #def _check_tank_collision(self):
     def update(self):
         """Call to freefall"""
+        self._check_any_collisions()
         self.free_fall()
 
     def draw_bomb(self):
-        """Draw the bullet to the screen"""
+        """Draw the bomb to the screen"""
         self.screen.blit(self.image, (self.rect.x, self.rect.y))
