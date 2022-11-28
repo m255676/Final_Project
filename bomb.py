@@ -1,7 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
-import time
-
+from time import sleep
 class Bomb(Sprite):
     """This class manages bombs dropped by jet"""
     # Pass in the Sprite class to use its features
@@ -14,7 +13,10 @@ class Bomb(Sprite):
         self.screen = jet_fighter_game.screen
 
         self.image = pygame.image.load('images/bomb_images/better_bomb.bmp')
-        self.image = pygame.transform.scale(self.image, (45, 45))
+        pygame.Surface.set_colorkey(self.image, (255, 255, 255))
+        pygame.Surface.set_colorkey(self.image, (238, 238, 238))
+        self.image = pygame.transform.scale(self.image, (30, 30))
+        self.image = pygame.transform.rotate(self.image, 270)
         self.rect = self.image.get_rect()
 
         self.start_pos_x = jet_fighter_game.jet.rect.x
@@ -24,31 +26,28 @@ class Bomb(Sprite):
 
         # Change in these speeds is only visiually noticable initially -
         # LATER SET THESE SPEEDS TO JET SPEED
-        self.bomb_vertical_speed = 1.0
-        self.bomb_horizontal_speed = 1.5
+        self.bomb_vertical_speed = 2.25
+        self.bomb_horizontal_speed = 1.0
 
         # Acceleration paramater controls y component change and controls visual appareance of 'speed' of bomb
         # Bomb will 'fall' faster for higher acceleration number
-        self.acceleration = .008
+        self.acceleration = .009
 
         # As drag constant increases the distance bomb travels in x increases over time
         # This is inverse what you would expect from a drag constant
-        self.drag = .04
+        self.drag = .03
         # Redefining self.rect input here using pygame.Rect so spritecollideany function will work
         self.rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
 
+        self.ground_collision = False
     def free_fall(self):
         """Update the self.rect.x and y to create free fall effect"""
-        self.rect.x += self.bomb_horizontal_speed
-        self.bomb_horizontal_speed += self.drag * self.bomb_vertical_speed
-        self.rect.y += self.bomb_vertical_speed**2
-        self.bomb_vertical_speed += self.acceleration * self.bomb_vertical_speed
+        self.rect.y += self.bomb_vertical_speed
 
-        self.rect.x = int(self.rect.x)
-        self.rect.y = int(self.rect.y)
-    def _check_any_collisions(self):
-        """All bomb collision checks"""
-        self._check_ground_collision()
+    def _check_tank_collision(self, tanks):
+        """Tank collision check"""
+        tank_collision = pygame.sprite.spritecollide(self, tanks, True)
+
 
     def _check_ground_collision(self):
         """Insert Explosion image if bomb hits ground and delete bomb"""
@@ -57,10 +56,13 @@ class Bomb(Sprite):
             # Once bomb hits the ground 'explode'
             self.image = pygame.image.load('images/bomb_images/better_explosion.bmp')
             self.image = pygame.transform.scale(self.image, (100, 100))
+            pygame.Surface.set_colorkey(self.image, (255, 255, 255))
+            self.ground_collision = True
 
     def update(self):
-        """Call to freefall"""
-        self._check_any_collisions()
+        """Call Fall and Check Ground or Tank Collisions"""
+        self._check_ground_collision()
+        #self._check_tank_collision(tanks)
         self.free_fall()
 
     def draw_bomb(self):

@@ -6,6 +6,8 @@ from ground import Ground
 from enemy_tank import Enemy_Tank
 from bomb import Bomb
 from enemy_jet import Enemy_Jet
+from enemy_missile import Enemy_Missile
+from friendly_missile import Friendly_Missile
 import time
 import math
 
@@ -22,7 +24,7 @@ class JetFighterGame:
         self.back_ground = pygame.image.load('images/blue_sky_background.bmp')
         self.back_ground = pygame.transform.scale(self.back_ground, (self.settings.screen_width, self.settings.screen_height))
 
-        self.loop_speed = 100
+        self.loop_speed = 80
         self.counter = 0
 
         self.jet = Jet(self)
@@ -31,6 +33,8 @@ class JetFighterGame:
 
         self.bombs = pygame.sprite.Group()
         self.enemy_tanks = pygame.sprite.Group()
+        self.enemy_missiles = pygame.sprite.Group()
+        self.friendly_missiles = pygame.sprite.Group()
 
     def run_game(self):
         """This is the main loop for the game"""
@@ -40,19 +44,28 @@ class JetFighterGame:
         while True:
             # Check for any key events
             self._check_events()
-            # This will call the jet movement function
-            self.jet.move_jet()
-            self.enemy_jet.flight(self.counter)
-            # Check if there have been any collisions
-            self._check_any_collisions()
+
+            self.enemy_jet.flight(self.counter, self.friendly_missiles)
             # This will move the tanks
             self.enemy_tanks.update()
             # This will update the bombs in our sprite group
             self.bombs.update()
+            # Check Ground Collisions
+            self._check_ground_collision()
             # Track Time using a counter
             self.counter += 1
-            if (self.counter % 500 == 0):
+            if (self.counter % 300 == 0):
+                # After certain time make tanks
                 self._make_new_tanks()
+            if (self.counter % 175 == 0):
+                # After certain time make enemy jet shoot missiles
+                self._shoot_enemy_missile()
+            # update the missiles so they travel across the screen.
+            self.enemy_missiles.update()
+            self.friendly_missiles.update()
+            # This will call the jet movement function
+            self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
+
             # Control FPS
             self.clock.tick(self.loop_speed)
             # Update Screen
@@ -78,28 +91,42 @@ class JetFighterGame:
             self.jet.moving_down = True
         elif event.key == pygame.K_SPACE:
             self._drop_bomb()
+        elif event.key == pygame.K_RIGHT:
+            self.jet.speeding_up = True
+        elif event.key == pygame.K_LEFT:
+            self._shoot_friendly_missile()
 
     def _check_keyup_events(self, event):
         if event.key == pygame.K_UP:
             self.jet.moving_up = False
         elif event.key == pygame.K_DOWN:
             self.jet.moving_down = False
+        elif event.key == pygame.K_RIGHT:
+            self.jet.speeding_up = False
 
     def _make_new_tanks(self):
         """After counter hits target number/ after desired elapsed time, make a new tank"""
         new_enemy_tank = Enemy_Tank(self)
         self.enemy_tanks.add(new_enemy_tank)
+    def _shoot_enemy_missile(self):
+        """"After counter hits target number/ after desired elapsed time, make a new missile"""
+        new_enemy_missile = Enemy_Missile(self)
+        self.enemy_missiles.add(new_enemy_missile)
+    def _shoot_friendly_missile(self):
+        """On key event make a missile instance and add to group to be updated in game loop"""
+        new_friendly_missile = Friendly_Missile(self)
+        self.friendly_missiles.add(new_friendly_missile)
 
     def _drop_bomb(self):
         """Create a new bomb and add it to the Sprite group"""
         new_bomb = Bomb(self)
         self.bombs.add(new_bomb)
-    def _check_any_collisions(self):
-        """Check for any bomb-tank, tank-plane, plane-plane, bomb-ground collisions and respond respectively"""
-        # Delete bomb and tank after collision
-        collision = pygame.sprite.groupcollide(self.bombs, self.enemy_tanks, True, True)
-        if collision:
-            print("Collision Test")
+
+    def _check_ground_collision(self):
+        """Check if the bomb's ground collision flag is true and delete bomb if it is"""
+        for bomb in self.bombs.sprites():
+            if bomb.ground_collision:
+                bomb.kill()
 
     def _update_screen(self):
         """This method updates the screen"""
@@ -107,8 +134,15 @@ class JetFighterGame:
         self.ground.blitme()
         self.jet.blitme()
         self.enemy_jet.blitme()
+        for enemy_missile in self.enemy_missiles.sprites():
+            enemy_missile.draw_missile()
+
+        for friendly_missile in self.friendly_missiles.sprites():
+            friendly_missile.draw_missile()
+
         for enemey_tank in self.enemy_tanks.sprites():
             enemey_tank.draw_tank()
+
         for bomb in self.bombs.sprites():
             bomb.draw_bomb()
         # Makes the most recently drawn screen visible

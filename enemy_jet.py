@@ -13,35 +13,37 @@ class Enemy_Jet:
         self.screen_rect = jet_fighter_game.screen.get_rect()
 
         # Load the jet's image
-        self.image = pygame.image.load('images/jet_images/AEG_CIV_attack_1.bmp')
-        self.image = pygame.transform.scale(self.image, (80, 80))
+        self.image = pygame.image.load('images/jet_images/enemy_plane.bmp')
+        self.image = pygame.transform.scale(self.image, (60, 60))
         self.image = pygame.transform.flip(self.image, True, False)
+        pygame.Surface.set_colorkey(self.image, (255, 255, 255))
         # Get the Jet's Rect so we can access and work with its dimmensions later
         self.rect = self.image.get_rect()
+
         self.start_pos_x = jet_fighter_game.settings.screen_width
         self.start_pos_y = int(jet_fighter_game.settings.screen_height/3)
         self.x = self.start_pos_x
         self.y = self.start_pos_y
-        self.theta = 0
-        self.x_speed = 2
 
-        self.counter = 0
-        self.adjusted_counter = 0
+        self.x_speed = 1.5
 
-    def flight(self, time):
+
+    def flight(self, time, friendly_missiles):
         """Method that makes the jet fly from right to left in sine path"""
         theta = .03 * time
         # Y Value set by sine function
-        self.y = int(self.start_pos_y + 120*(math.sin(theta)))
+        self.y = int(self.start_pos_y + 190*(math.sin(theta + 80)))
 
-        self.counter += 1
-        # Will probably look like this: self.y = self.ycopy + Amplitude* sin(theta_list[i])
-        # where theta list has different radian values for sin curve
         # If the enemy plane's back edge hits the edge of the screen reset it to the right side
         if self.x <= 0 - self.rect.width:
             self.x = self.start_pos_x
         else:
             self.x -= self.x_speed
+
+        missile_jet_collision = pygame.sprite.spritecollide(self, friendly_missiles, True)
+        if missile_jet_collision:
+            self.x = self.start_pos_x
+
     def blitme(self):
         """This is what will allow the jet to be drawn to the screen when we call from jet fighter game"""
         self.screen.blit(self.image, (self.x, self.y))

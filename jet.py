@@ -1,5 +1,6 @@
 import pygame
 from pygame.sprite import Sprite
+from time import sleep
 
 class Jet:
     """Class to manage Jet gameplay"""
@@ -13,8 +14,8 @@ class Jet:
         self.screen_rect = jet_fighter_game.screen.get_rect()
 
         # Load the jet's image
-        self.image = pygame.image.load('images/jet_images/AEG_CIV_attack_1.bmp')
-        self.image = pygame.transform.scale(self.image, (80,80))
+        self.image = pygame.image.load('images/jet_images/AEG_CIV_attack_1.bmp').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (60,60))
         # Get the Jet's Rect so we can access and work with its dimmensions later
         self.rect = self.image.get_rect()
         self.height = self.rect.height
@@ -27,31 +28,45 @@ class Jet:
         # Flags that will be changed in keydown/ups in order to have continous movement for duration of keydown
         self.moving_up = False
         self.moving_down = False
+        self.speeding_up = False
 
-    def move_jet(self):
+        self.jet_speed_x = 3.0
+        self.acceleration = .005
+
+    def move_jet(self, enemy_missiles, friendly_missiles, bombs, tanks):
         """Ques the horizontal and vertical movements, so they happen nearly simultaneously"""
+        missiles_collided = pygame.sprite.groupcollide(enemy_missiles, friendly_missiles, True, True)
+        missile_jet_collision = pygame.sprite.spritecollide(self, enemy_missiles, True)
+        if missile_jet_collision:
+            # Pause the game if the enemy missile collided with the jet and reset the jet to the left side of the screen
+            sleep(.75)
+            self._reset_jet()
+        bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
         self.fly_right()
         self.increase_altitude()
         self.decrease_altitude()
     def fly_right(self):
         """Method that will move the jet rightward on the screen"""
-        jet_speed = 3.0 #Later move to settings
         # Check if the jet is at the right edge, if it is reset to the left side before flying right
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
+        if self.speeding_up:
+            self.jet_speed_x = 6
+            self.rect.x += self.jet_speed_x
         else:
-            self.rect.x += jet_speed
+            self.jet_speed_x = 3.0
+            self.rect.x += self.jet_speed_x
     def increase_altitude(self):
         """This will increase the altitude of the jet"""
         # Only increase altitude when not at top of screen
-        jet_speed_up = 2.0 #Later move to settings
+        jet_speed_up = 3.0 #Later move to settings
         if self.rect.y > 0 and self.moving_up:
             self.rect.y -= jet_speed_up
 
     def decrease_altitude(self):
         """This will decrease the altitude of the jet"""
         # Only decrease if not below bottom third of screen
-        jet_speed_down = 2.0 #Later move to settings
+        jet_speed_down = 3.0 #Later move to settings
         if self.rect.y < self.settings.screen_height * 2/3 and self.moving_down:
             self.rect.y += jet_speed_down
 
