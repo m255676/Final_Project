@@ -17,8 +17,8 @@ class Enemy_Missile(Sprite):
         pygame.Surface.set_colorkey(self.image, (255,255,255))
         self.rect = self.image.get_rect()
 
-        self.start_pos_x = jet_fighter_game.enemy_jet.x
-        self.start_pos_y = jet_fighter_game.enemy_jet.y
+        self.start_pos_x = jet_fighter_game.enemy_jet.rect.x
+        self.start_pos_y = jet_fighter_game.enemy_jet.rect.y
         self.rect.x = self.start_pos_x
         self.rect.y = self.start_pos_y
 

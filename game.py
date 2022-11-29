@@ -62,14 +62,13 @@ class JetFighterGame:
 
                 # Run the game while the game is not paused and the player still has lives
                 if not self.game_paused:
+                    # Always set this to the adjusted number in settings
                     self.lives_left = self.settings.lives_left
-                    print(self.lives_left)
                     if self.lives_left <=0:
                         print("All out of lives")
                         self._end_game()
                         break
                     self._check_events()
-                    self.enemy_jet.flight(self.counter, self.friendly_missiles)
                     # This will move the tanks
                     self.enemy_tanks.update()
                     # This will update the bombs in our sprite group
@@ -90,8 +89,10 @@ class JetFighterGame:
                     # update the missiles so they travel across the screen.
                     self.enemy_missiles.update()
                     self.friendly_missiles.update()
-                    # This will call the jet movement function
+                    # This will call the jet movement functions for each jet passing in the neccessary groups to detect for collisions
+                    # between game elements (there is no particular reason most of this evaluation takes place in the jet move function)
                     self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
+                    self.enemy_jet.flight(self.counter, self.friendly_missiles)
                     # Control FPS
                     self.clock.tick(self.loop_speed)
                     # Update Screen
@@ -208,7 +209,7 @@ class JetFighterGame:
     def _end_game(self):
         """Run until play again button is clicked or game is exited"""
         while True:
-            self.screen.fill((200, 100, 100))
+            self.screen.fill((255, 0, 0))
             self.font = pygame.font.SysFont(None, 54)
             self.img = self.font.render(f"GAME OVER", True, (230, 230, 230))
             self.img_rect = self.img.get_rect()

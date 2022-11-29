@@ -35,4 +35,5 @@ class Friendly_Missile(Sprite):
 
     def draw_missile(self):
         """Draw missile to the screen"""
+
         self.screen.blit(self.image, (self.rect.x, self.rect.y))
