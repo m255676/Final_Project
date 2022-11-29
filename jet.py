@@ -41,6 +41,11 @@ class Jet:
             # Pause the game if the enemy missile collided with the jet and reset the jet to the left side of the screen
             sleep(.75)
             self._reset_jet()
+            # Subtract one life from the number of lives left
+            self.settings.lives_left -= 1
+            print("Ship Hit")
+            print(f"In jet: {self.settings.lives_left}")
+            # Make Explosion at collision
         bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
         #print(bomb_tank_collision)
         self.fly_right()

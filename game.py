@@ -10,6 +10,8 @@ from enemy_missile import Enemy_Missile
 from friendly_missile import Friendly_Missile
 from button import PlayButton
 from button import PauseButton
+from button import PlayAgainButton
+from game_stats import GameStats
 import time
 import math
 
@@ -20,6 +22,8 @@ class JetFighterGame:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
+        self.stats = GameStats(self)
+        self.lives_left = self.settings.lives_left
 
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Jet Fighter Game")
@@ -43,59 +47,62 @@ class JetFighterGame:
 
         self.play_button = PlayButton(self, "Single Player")
         self.pause_button = PauseButton(self, "Pause")
+        self.play_again_button = PlayAgainButton(self, "Play Again")
 
     def run_game(self):
         """This is the main loop for the game"""
         # Need to make an instance of the first tank to run before the counter starts making new tanks
         first_tank = Enemy_Tank(self)
         self.enemy_tanks.add(first_tank)
-
-        # Run while the game is not running
-        # Still need to be able to check for events
-        # Still need to draw the start game features: Single/ Multiplayer, Credits
         while not self.game_active:
-            # Check for any key events
             self._check_events()
             self._update_screen()
 
-        # Run the game if the game has been set to active, when the play button has been clicked
         while self.game_active:
-            # Run the game while the game is not paused
-            if not self.game_paused:
-                self._check_events()
-                self.enemy_jet.flight(self.counter, self.friendly_missiles)
-                # This will move the tanks
-                self.enemy_tanks.update()
-                # This will update the bombs in our sprite group
-                self.bombs.update()
-                # Check Ground Collisions
-                self._check_ground_collision()
-                # Track Time using a counter
-                self.counter += 1
-                if (self.counter % 300 == 0):
-                # After certain time make tanks
-                    self._make_new_tanks()
-                if (self.counter % 175 == 0):
-                # After certain time make enemy jet shoot missiles
-                    self._shoot_enemy_missile()
-                # update the missiles so they travel across the screen.
-                self.enemy_missiles.update()
-                self.friendly_missiles.update()
-                # This will call the jet movement function
-                self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
+
+                # Run the game while the game is not paused and the player still has lives
+                if not self.game_paused:
+                    self.lives_left = self.settings.lives_left
+                    print(self.lives_left)
+                    if self.lives_left <=0:
+                        print("All out of lives")
+                        self._end_game()
+                        break
+                    self._check_events()
+                    self.enemy_jet.flight(self.counter, self.friendly_missiles)
+                    # This will move the tanks
+                    self.enemy_tanks.update()
+                    # This will update the bombs in our sprite group
+                    self.bombs.update()
+                    # Check Ground Collisions
+                    self._check_ground_collision()
+                    # Track Time using a counter
+                    self.counter += 1
+                    if (self.counter % 300 == 0):
+                    # After certain time make tanks
+                        self._make_new_tanks()
+                    if (self.counter % 175 == 0):
+                    # After certain time make enemy jet shoot missiles
+                        self._shoot_enemy_missile()
+
+                    # Add a timer for a power up that grants and extra life that comes in at a sine curve at a random y value.
+
+                    # update the missiles so they travel across the screen.
+                    self.enemy_missiles.update()
+                    self.friendly_missiles.update()
+                    # This will call the jet movement function
+                    self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
+                    # Control FPS
+                    self.clock.tick(self.loop_speed)
+                    # Update Screen
+                    self._update_screen()
 
 
-                # Control FPS
-                self.clock.tick(self.loop_speed)
-                # Update Screen
-                self._update_screen()
-
-            # If the game is just continue to draw everything at its last position
-            # and continue to look for events in order to exit or unpause the game
-            elif self.game_paused:
-                self._check_events()
-                self._update_screen()
-
+                    # If the game is just continue to draw everything at its last position
+                    # and continue to look for events in order to exit or unpause the game
+                elif self.game_paused:
+                    self._check_events()
+                    self._update_screen()
 
     def _check_events(self):
         """This method responds to key events"""
@@ -112,6 +119,7 @@ class JetFighterGame:
                 mouse_pos = pygame.mouse.get_pos()
                 self._check_play_button(mouse_pos)
                 self._check_pause_button(mouse_pos)
+                self._check_play_again_button(mouse_pos)
 
     def _check_keydown_events(self, event):
         """This method responds to keypresses"""
@@ -135,6 +143,7 @@ class JetFighterGame:
         # These conditions mean that the game won't restart if the button area is accidentally clicked in game
         if play_button_clicked and not self.game_active:
             self.game_active = True
+            self.first_start = False
 
     def _check_pause_button(self, mouse_pos):
         """ Pause the game if the game is not already paused"""
@@ -145,6 +154,24 @@ class JetFighterGame:
         # If the pause button is clicked while the game is already paused then unpause the game
         elif pause_button_clicked and self.game_paused:
             self.game_paused = False
+
+    def _check_play_again_button(self, mouse_pos):
+        """Only respond to clicking the play again button if the game has stopped and there are no lives left"""
+        play_again_button_clicked = self.play_again_button.rect.collidepoint(mouse_pos)
+        # The play again button will reset the game and reset all game stats
+        if self.lives_left <= 0 and play_again_button_clicked:
+            # Empty Bomb, Missiles, and Tank List and Reset Jet positions
+            # Also reset the counter and all jet stats
+            self.settings.lives_left = 1
+            self.jet._reset_jet()
+            self.friendly_missiles.empty()
+            self.enemy_missiles.empty()
+            self.enemy_tanks.empty()
+            self.bombs.empty()
+            self.counter = 0
+            self.enemy_jet.reset_jet()
+            self.run_game()
+
 
     def _check_keyup_events(self, event):
         if event.key == pygame.K_UP:
@@ -177,6 +204,21 @@ class JetFighterGame:
         for bomb in self.bombs.sprites():
             if bomb.ground_collision:
                 bomb.kill()
+
+    def _end_game(self):
+        """Run until play again button is clicked or game is exited"""
+        while True:
+            self.screen.fill((200, 100, 100))
+            self.font = pygame.font.SysFont(None, 54)
+            self.img = self.font.render(f"GAME OVER", True, (230, 230, 230))
+            self.img_rect = self.img.get_rect()
+            self.img_rect.center = (self.screen.get_rect().width/2, self.screen.get_rect().height/2 - 90)
+            self.screen.blit(self.img, self.img_rect)
+            self.clock.tick(self.loop_speed)
+            self.play_again_button.draw_button()
+            self._check_events()
+            pygame.display.flip()
+
 
     def _update_screen(self):
         """This method updates the screen"""

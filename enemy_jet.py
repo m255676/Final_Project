@@ -36,7 +36,7 @@ class Enemy_Jet:
 
         # If the enemy plane's back edge hits the edge of the screen reset it to the right side
         if self.x <= 0 - self.rect.width:
-            self.x = self.start_pos_x
+            self.reset_jet()
         else:
             self.x -= self.x_speed
 
@@ -44,6 +44,12 @@ class Enemy_Jet:
         if missile_jet_collision:
             self.x = self.start_pos_x
 
+    def reset_jet(self):
+        """When the leftmost of the jet hits the leftmost side of the screen reset the jet to the right side"""
+        # Making this a method so that I can call it from within the main game
+        self.x = self.start_pos_x
+        # Reset to the start height as well
+        self.y = self.start_pos_y
     def blitme(self):
         """This is what will allow the jet to be drawn to the screen when we call from jet fighter game"""
         self.screen.blit(self.image, (self.x, self.y))
