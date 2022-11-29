@@ -65,6 +65,7 @@ class JetFighterGame:
             self.friendly_missiles.update()
             # This will call the jet movement function
             self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
+            print(self.bombs)
 
             # Control FPS
             self.clock.tick(self.loop_speed)

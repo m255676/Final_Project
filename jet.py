@@ -42,6 +42,7 @@ class Jet:
             sleep(.75)
             self._reset_jet()
         bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
+        #print(bomb_tank_collision)
         self.fly_right()
         self.increase_altitude()
         self.decrease_altitude()

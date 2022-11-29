@@ -30,9 +30,10 @@ class Enemy_Tank(Sprite):
     def move_tank(self):
         """Function to move tank"""
         self.rect.x -= 1.75
+        self.rect.y = self.start_pos_y
         # Creating this Rect attribute so collision will run
         self.rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
 
     def draw_tank(self):
         """Function to draw tank to screen"""
-        self.screen.blit(self.image, (self.rect.x, self.start_pos_y))
+        self.screen.blit(self.image, self.rect)

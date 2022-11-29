@@ -67,4 +67,4 @@ class Bomb(Sprite):
 
     def draw_bomb(self):
         """Draw the bomb to the screen"""
-        self.screen.blit(self.image, (self.rect.x, self.rect.y))
+        self.screen.blit(self.image, self.rect)
