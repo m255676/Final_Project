@@ -8,6 +8,7 @@ from bomb import Bomb
 from enemy_jet import Enemy_Jet
 from enemy_missile import Enemy_Missile
 from friendly_missile import Friendly_Missile
+from button import Button
 import time
 import math
 
@@ -36,15 +37,19 @@ class JetFighterGame:
         self.enemy_missiles = pygame.sprite.Group()
         self.friendly_missiles = pygame.sprite.Group()
 
+        self.game_active = False
+        self.play_button = Button(self, "Play")
+
     def run_game(self):
         """This is the main loop for the game"""
         # Need to make an instance of the first tank to run before the counter starts making new tanks
         first_tank = Enemy_Tank(self)
         self.enemy_tanks.add(first_tank)
+        # Reset the mouse to visible after we've made it invisible the last we clicked the button
+        pygame.mouse.set_visible(True)
         while True:
             # Check for any key events
             self._check_events()
-
             self.enemy_jet.flight(self.counter, self.friendly_missiles)
             # This will move the tanks
             self.enemy_tanks.update()
@@ -81,6 +86,11 @@ class JetFighterGame:
                 self._check_keydown_events(event)
             elif event.type == pygame.KEYUP:
                 self._check_keyup_events(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                # Check for mouse button down event and log the position of it
+                #       so that we can check for the button being 'clicked' in our check play button function
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
 
     def _check_keydown_events(self, event):
         """This method responds to keypresses"""
@@ -97,6 +107,15 @@ class JetFighterGame:
         elif event.key == pygame.K_LEFT:
             self._shoot_friendly_missile()
 
+    def _check_play_button(self, mouse_pos):
+        """ Start a new game when the player clicks Play"""
+        button_clicked = self.play_button.rect.collidepoint(mouse_pos)
+        # Only start the game if the game is not running and the button is clicked
+        # These conditions mean that the game won't restart if the button area is accidentally clicked in game
+        if button_clicked and not self.game_active:
+            self.game_active = True
+            # Hide the mouse cursor after we've clicked the button
+            pygame.mouse.set_visible(False)
     def _check_keyup_events(self, event):
         if event.key == pygame.K_UP:
             self.jet.moving_up = False
@@ -146,6 +165,11 @@ class JetFighterGame:
 
         for bomb in self.bombs.sprites():
             bomb.draw_bomb()
+
+        # Draw the play button if the game is not active
+        if not self.game_active:
+            self.play_button.draw_button()
+
         # Makes the most recently drawn screen visible
         pygame.display.flip()
 
