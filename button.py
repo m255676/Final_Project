@@ -1,6 +1,6 @@
 import pygame.font
 
-class Button:
+class PlayButton:
     def __init__(self, jet_fighter_game, msg):
         """Initialize button attributes"""
         self.screen = jet_fighter_game.screen

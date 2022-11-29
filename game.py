@@ -8,7 +8,7 @@ from bomb import Bomb
 from enemy_jet import Enemy_Jet
 from enemy_missile import Enemy_Missile
 from friendly_missile import Friendly_Missile
-from button import Button
+from button import PlayButton
 import time
 import math
 
@@ -38,17 +38,21 @@ class JetFighterGame:
         self.friendly_missiles = pygame.sprite.Group()
 
         self.game_active = False
-        self.play_button = Button(self, "Play")
+        self.play_button = PlayButton(self, "Play")
 
     def run_game(self):
         """This is the main loop for the game"""
         # Need to make an instance of the first tank to run before the counter starts making new tanks
         first_tank = Enemy_Tank(self)
         self.enemy_tanks.add(first_tank)
-        # Reset the mouse to visible after we've made it invisible the last we clicked the button
-        pygame.mouse.set_visible(True)
-        while True:
+
+
+        while not self.game_active:
             # Check for any key events
+            self._check_events()
+            self._update_screen()
+
+        while self.game_active:
             self._check_events()
             self.enemy_jet.flight(self.counter, self.friendly_missiles)
             # This will move the tanks
@@ -60,17 +64,17 @@ class JetFighterGame:
             # Track Time using a counter
             self.counter += 1
             if (self.counter % 300 == 0):
-                # After certain time make tanks
+            # After certain time make tanks
                 self._make_new_tanks()
             if (self.counter % 175 == 0):
-                # After certain time make enemy jet shoot missiles
+            # After certain time make enemy jet shoot missiles
                 self._shoot_enemy_missile()
             # update the missiles so they travel across the screen.
             self.enemy_missiles.update()
             self.friendly_missiles.update()
             # This will call the jet movement function
             self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
-            print(self.bombs)
+
 
             # Control FPS
             self.clock.tick(self.loop_speed)
@@ -114,8 +118,7 @@ class JetFighterGame:
         # These conditions mean that the game won't restart if the button area is accidentally clicked in game
         if button_clicked and not self.game_active:
             self.game_active = True
-            # Hide the mouse cursor after we've clicked the button
-            pygame.mouse.set_visible(False)
+
     def _check_keyup_events(self, event):
         if event.key == pygame.K_UP:
             self.jet.moving_up = False
