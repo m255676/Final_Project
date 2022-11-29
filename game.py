@@ -42,7 +42,7 @@ class JetFighterGame:
         self.game_paused = False
 
         self.play_button = PlayButton(self, "Single Player")
-        self.pause_button = PauseButton(self, "!!")
+        self.pause_button = PauseButton(self, "Pause")
 
     def run_game(self):
         """This is the main loop for the game"""

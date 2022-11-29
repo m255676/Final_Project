@@ -9,7 +9,8 @@ class PlayButton:
 
         # Set the dimensions and properties of the button
         self.width, self.height = 250, 50
-        self.button_color = (0, 255, 0)
+        # Make the pause button color grey
+        self.button_color = (150, 150, 150)
         self.text_color = (255, 255, 255)
         self.font = pygame.font.SysFont(None, 48)
 
@@ -39,17 +40,18 @@ class PauseButton:
         self.screen_rect = self.screen.get_rect()
 
         # Set the dimensions and properties of the button
-        self.width, self.height = 50, 50
-        self.button_color = (0, 255, 0)
+        self.width, self.height = 80, 25
+        # Make the pause button color grey
+        self.button_color = (150, 150, 150)
         self.text_color = (255, 255, 255)
-        self.font = pygame.font.SysFont(None, 24)
+        self.font = pygame.font.SysFont(None, 26)
 
         # Build the button's rect and center it.
         self.rect = pygame.Rect(0, 0, self.width, self.height)
         # Set the button to the top left corner of the game so that its out of the way
         self.rect.x = 0
         self.rect.y = 0
-        self.rect.center = (self.rect.x, self.rect.y)
+        self.rect.topleft = (self.rect.x, self.rect.y)
 
         # The button message
         self._prep_msg(msg)
@@ -58,7 +60,7 @@ class PauseButton:
         """Turn the msg into a rendered image and center text on the button"""
         self.msg_image = self.font.render(msg, True, self.text_color, self.button_color)
         self.msg_image_rect = self.msg_image.get_rect()
-        self.msg_image_rect.center = self.rect.center
+        self.msg_image_rect.center = (self.width/2, self.height/2)
 
     def draw_button(self):
         """ Draw a blank button and then draw the message"""
