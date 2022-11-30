@@ -1,0 +1,1 @@
+# This will be a sprite that grants an extra life if shot down

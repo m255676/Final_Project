@@ -7,3 +7,5 @@ class Settings():
         self.screen_height = 600
         self.ground_height = self.screen_height / 10
         self.lives_left = 1
+        self.score = 0
+        self.bg_color = (215, 215, 215)

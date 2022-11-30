@@ -65,14 +65,14 @@ class Jet:
     def increase_altitude(self):
         """This will increase the altitude of the jet"""
         # Only increase altitude when not at top of screen
-        jet_speed_up = 3.0 #Later move to settings
+        jet_speed_up = 4.25 #Later move to settings
         if self.rect.y > 0 and self.moving_up:
             self.rect.y -= jet_speed_up
 
     def decrease_altitude(self):
         """This will decrease the altitude of the jet"""
         # Only decrease if not below bottom third of screen
-        jet_speed_down = 3.0 #Later move to settings
+        jet_speed_down = 4.25 #Later move to settings
         if self.rect.y < self.settings.screen_height * 2/3 and self.moving_down:
             self.rect.y += jet_speed_down
 

@@ -30,7 +30,10 @@ class Enemy_Jet:
 
     def flight(self, time, friendly_missiles):
         """Method that makes the jet fly from right to left in sine path"""
+        # scale theta by a small decimal to give the effect of infinitesimally hitting every theta value on the sign curve
+        #   so that the flight path appears continuous
         theta = .03 * time
+
         # Y Value set by sine function
         self.rect.y = int(self.start_pos_y + 190*(math.sin(theta + 80)))
 
@@ -45,6 +48,17 @@ class Enemy_Jet:
         if missile_jet_collision:
             print("Collision")
             self.reset_jet()
+
+        # speed up the speed of the enemy jet over time until it reaches a max speed that makes the game reasonably difficult
+        #   we evaluate the time from our main game loop counter thats passed into this method
+        if (time % 500) == 0:
+            # Max speed out at 2.5
+            if self.x_speed >= 4.0:
+                self.x_speed = 4.0
+            else:
+                self.x_speed += 0.25
+
+
 
     def reset_jet(self):
         """When the leftmost of the jet hits the leftmost side of the screen reset the jet to the right side"""

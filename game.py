@@ -48,6 +48,11 @@ class JetFighterGame:
         self.play_button = PlayButton(self, "Single Player")
         self.pause_button = PauseButton(self, "Pause")
         self.play_again_button = PlayAgainButton(self, "Play Again")
+        self.trigger_decrease = 20
+        self.make_new_tanks_trigger = 300
+        self.shoot_enemy_missile_trigger = 175
+
+        self.game_level = 1
 
     def run_game(self):
         """This is the main loop for the game"""
@@ -69,38 +74,69 @@ class JetFighterGame:
                         self._end_game()
                         break
                     self._check_events()
+
                     # This will move the tanks
-                    self.enemy_tanks.update()
+                    # Pass in counter so tanks will speed themselves up over time
+                    self.enemy_tanks.update(self.counter)
+
                     # This will update the bombs in our sprite group
                     self.bombs.update()
-                    # Check Ground Collisions
+                    # Check Ground Collisions for bombs
                     self._check_ground_collision()
+
                     # Track Time using a counter
                     self.counter += 1
-                    if (self.counter % 300 == 0):
+
                     # After certain time make tanks
+                    if (self.counter % self.make_new_tanks_trigger == 0):
                         self._make_new_tanks()
-                    if (self.counter % 175 == 0):
+
                     # After certain time make enemy jet shoot missiles
+                    if (self.counter % self.shoot_enemy_missile_trigger == 0):
                         self._shoot_enemy_missile()
 
-                    # Add a timer for a power up that grants and extra life that comes in at a sine curve at a random y value.
+                    # After certain time decrement the time it will take to make new tanks and shoot enemy missiles
+                    # Doing this to speed up the frequency at which these events happen, speeding up game play
+                    # This will only decrement to a certain amount to maintain reasonable playability
+                    if (self.counter % 500 == 0):
+                        # make new tanks trigger can only reach this low
+                        if self.make_new_tanks_trigger <= 150:
+                            self.make_new_tanks_trigger = 150
+                        else:
+                            self.make_new_tanks_trigger -= self.trigger_decrease
+                        # shoot enemy missile trigger can only reach this low
+                        if self.shoot_enemy_missile_trigger <= 100:
+                            self.shoot_enemy_missile_trigger = 100
+                        else:
+                            self.shoot_enemy_missile_trigger -= self.trigger_decrease
+
+                    # Every 500 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet missile spawn
+                    #   frequency increases so I will say that for every 10 times we speed up the game this will be a new level
+                    if (self.counter % 500*10) == 0:
+                        self.game_level += 1
+                        print(self.game_level)
+                        # With each level up a power up that grants and extra life will spawn and travel in at a cos curve
+                        #   shooting the power up grant you an additional life
+
 
                     # update the missiles so they travel across the screen.
                     self.enemy_missiles.update()
                     self.friendly_missiles.update()
+
                     # This will call the jet movement functions for each jet passing in the neccessary groups to detect for collisions
                     # between game elements (there is no particular reason most of this evaluation takes place in the jet move function)
                     self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
                     self.enemy_jet.flight(self.counter, self.friendly_missiles)
+
                     # Control FPS
                     self.clock.tick(self.loop_speed)
+
                     # Update Screen
                     self._update_screen()
 
 
-                    # If the game is just continue to draw everything at its last position
-                    # and continue to look for events in order to exit or unpause the game
+                # If the game is paused just continue to draw everything at its last position
+                # and continue to look for events in order to exit or unpause the game
                 elif self.game_paused:
                     self._check_events()
                     self._update_screen()
@@ -172,7 +208,6 @@ class JetFighterGame:
             self.counter = 0
             self.enemy_jet.reset_jet()
             self.run_game()
-
 
     def _check_keyup_events(self, event):
         if event.key == pygame.K_UP:
