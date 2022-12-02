@@ -72,7 +72,6 @@ class JetFighterGame:
             self._update_screen()
 
         while self.game_active:
-
                 # Run the game while the game is not paused and the player still has lives
                 if not self.game_paused:
                     # Always set this to the adjusted number in settings
@@ -118,22 +117,24 @@ class JetFighterGame:
                         else:
                             self.shoot_enemy_missile_trigger -= self.trigger_decrease
 
-                    # Every 500 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet missile spawn
-                    #   frequency increases so I will say that for every 10 times we speed up the game this will be a new level
+                    # Every 500 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet
+                    # missile spawn frequency increases so I will say that for every 10 times we speed up the game
+                    # this will be a new level
                     if (self.counter % 500*10) == 0:
                         self.game_level += 1
                         print(self.game_level)
                         print(self.settings.tank_hit_points)
-                        # With each level up a power up that grants and extra life will spawn and travel in at a cos curve
-                        #   shooting the power up grant you an additional life
+                        # With each level up a power up that grants and extra life will spawn and travel
+                        # in at a cos curve shooting the power up grant you an additional life
 
 
                     # update the missiles so they travel across the screen.
                     self.enemy_missiles.update()
                     self.friendly_missiles.update()
 
-                    # This will call the jet movement functions for each jet passing in the neccessary groups to detect for collisions
-                    # between game elements (there is no particular reason most of this evaluation takes place in the jet move function)
+                    # This will call the jet movement functions for each jet passing in the neccessary groups to
+                    # detect for collisions between game elements (there is no particular reason most of this
+                    # evaluation takes place in the jet move function)
                     # Also pass in counter so that the score multiplier is incremented based on game level and time
                     self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks, self.counter)
                     self.enemy_jet.flight(self.counter, self.friendly_missiles)
@@ -217,10 +218,16 @@ class JetFighterGame:
             self.bombs.empty()
             self.counter = 0
             self.enemy_jet.reset_jet()
-            # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the game level
+            # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the
+            # game level
             self.settings.tank_hit_points = 50
+            # Before I set the current score back to zero I need to evaluate if this is a new highscore so I call
+            # the following:
             self.scoreboard.check_high_score()
+            # Once I've checked the score I reset the current stats to their respective starting value
             self.stats.reset_stats()
+            # Call the prep score and prep high score functions so the score and high score is displayed at the start
+            # of the game
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
 

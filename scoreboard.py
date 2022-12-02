@@ -48,9 +48,9 @@ class Scoreboard:
         high_score_txt = "HIGH SCORE"
         self.high_score_txt_image = self.font.render(high_score_txt, True, self.text_color, None)
 
-        # Center this text at the top of the screen, even with the text of current score
+        # Have "high score" set 20 pixels to the left of current score, even in height with the text of "current score"
         self.high_score_txt_rect = self.high_score_txt_image.get_rect()
-        self.high_score_txt_rect.centerx = self.screen_rect.centerx
+        self.high_score_txt_rect.x = self.score_txt_rect.x - self.high_score_txt_rect.width - 20
         self.high_score_txt_rect.top = self.score_txt_rect.top
 
         # Make the high score a string then make that string an image
@@ -58,9 +58,9 @@ class Scoreboard:
         high_score_str = "{:,}".format(high_score)
         self.high_score_image = self.font.render(high_score_str, True, self.text_color, None)
 
-        # Center the high score at the top of the screen.
+        # Have the high score centered under "HIGH SCORE"
         self.high_score_rect = self.high_score_image.get_rect()
-        self.high_score_rect.centerx = self.screen_rect.centerx
+        self.high_score_rect.centerx = self.high_score_txt_rect.centerx
         self.high_score_rect.top = self.score_rect.top
 
     def show_score(self):
