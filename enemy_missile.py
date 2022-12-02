@@ -11,8 +11,8 @@ class Enemy_Missile(Sprite):
         self.settings = jet_fighter_game.settings
         self.screen = jet_fighter_game.screen
 
-        self.image = pygame.image.load('images/jet_images/enemy_missile.png')
-        self.image = pygame.transform.scale(self.image, (50, 40))
+        self.image = pygame.image.load('images/jet_images/missile_transparent.png')
+        self.image = pygame.transform.scale(self.image, (50, 45))
         self.image = pygame.transform.rotate(self.image,90)
         pygame.Surface.set_colorkey(self.image, (255,255,255))
         self.rect = self.image.get_rect()

@@ -36,14 +36,31 @@ class Jet:
         self.jet_speed_x = 3.0
         self.acceleration = .005
 
+    def _check_lives(self):
+        """Function that checks the lives left and changes the image of the jet accordingly"""
+        if self.settings.lives_left == 2:
+            # Load the jet's new image
+            self.image = pygame.image.load('images/jet_images/Damaged_Jet_1_Transparent.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (60, 60))
+        elif self.settings.lives_left == 1:
+            # Load the jet's new image
+            self.image = pygame.image.load('images/jet_images/Damaged_Jet_2_Transparent.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (60, 60))
+        elif self.settings.lives_left == 0:
+            # Load the jet's new image
+            self.image = pygame.image.load('images/jet_images/AEG_CIV_death_1.png').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (60, 60))
+
     def move_jet(self, enemy_missiles, friendly_missiles, bombs, tanks, counter):
         """Ques the horizontal and vertical movements, so they happen nearly simultaneously"""
+        # Check lives left and adjust image based on lives left
+        self._check_lives()
         missiles_collided = pygame.sprite.groupcollide(enemy_missiles, friendly_missiles, True, True)
         missile_jet_collision = pygame.sprite.spritecollide(self, enemy_missiles, True)
         if missile_jet_collision:
             # Pause the game if the enemy missile collided with the jet and reset the jet to the left side of the screen
-            sleep(.75)
-            self._reset_jet()
+            #sleep(1.0)
+            #self._reset_jet()
             # Subtract one life from the number of lives left
             self.settings.lives_left -= 1
 
@@ -66,6 +83,8 @@ class Jet:
             self._reset_jet()
             # After we reset the jet also reset our bombs and missiles available
             self.settings.bombs_available = 5
+            self.settings.friendly_missiles_available = 4
+
         if self.speeding_up:
             self.jet_speed_x = 7
             self.rect.x += self.jet_speed_x

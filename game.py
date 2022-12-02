@@ -14,6 +14,8 @@ from button import PlayAgainButton
 from game_stats import GameStats
 from scoreboard import Scoreboard
 from lives import Lives
+from bomb_lives import BombLives
+from friendly_missile_lives import FriendlyMissileLives
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -75,7 +77,7 @@ class JetFighterGame:
                 if not self.game_paused:
                     # Always set this to the adjusted number in settings
                     self.lives_left = self.settings.lives_left
-                    if self.lives_left <=0:
+                    if self.lives_left <0:
                         self._end_game()
                         break
                     self._check_events()
@@ -187,11 +189,13 @@ class JetFighterGame:
                 self._drop_bomb()
                 # After dropping a bomb remove one bomb from our available bombs - availability resets when jet does
                 self.settings.bombs_available -= 1
-                print(self.settings.bombs_available)
         elif event.key == pygame.K_RIGHT:
             self.jet.speeding_up = True
         elif event.key == pygame.K_LEFT:
-            self._shoot_friendly_missile()
+            # This will work the same way as dropping bombs in the check space-bar event above
+            if self.settings.friendly_missiles_available >= 1:
+                self._shoot_friendly_missile()
+                self.settings.friendly_missiles_available -= 1
 
     def _check_play_button(self, mouse_pos):
         """ Start a new game when the player clicks Play"""
@@ -216,12 +220,15 @@ class JetFighterGame:
         """Only respond to clicking the play again button if the game has stopped and there are no lives left"""
         play_again_button_clicked = self.play_again_button.rect.collidepoint(mouse_pos)
         # The play again button will reset the game and reset all game stats
-        if self.lives_left <= 0 and play_again_button_clicked:
+        if self.lives_left < 0 and play_again_button_clicked:
             # Empty Bomb, Missiles, and Tank List and Reset Jet positions
             # Reset enemy jet speed and reset enemy tank speed since it will have incremented from last game play
             # Reset the counter and all game stats:
             self.settings.lives_left = 3
             self.settings.game_level = 1
+            # Change the jet image back to our original jet image/ jet size
+            self.jet.image = pygame.image.load('images/jet_images/AEG_CIV_attack_1.bmp').convert_alpha()
+            self.jet.image = pygame.transform.scale(self.jet.image, (60,60))
             self.jet._reset_jet()
             self.friendly_missiles.empty()
             self.enemy_missiles.empty()
@@ -234,6 +241,8 @@ class JetFighterGame:
             # Need to reset the triggers that speed up during the game
             self.make_new_tanks_trigger = 200
             self.shoot_enemy_missile_trigger = 185
+            # Reset available bombs
+            self.settings.bombs_available = 5
             # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the
             # game level
             self.settings.tank_hit_points = 50
@@ -323,16 +332,35 @@ class JetFighterGame:
             # and set their height to 0 so that the group can be seen on the screen next to the pause button
             # I will have to account for the width of each life relative the how many lives there are in the group
             # to do this I will place the new x value for the new life relative to its number in the group
-            life.rect.x = 80 + 10 + (life.rect.width + 10)* life_number
+            life.rect.x = 80 + 10 + (life.rect.width + 10) * life_number
 
             life.rect.y = -10
             self.lives.add(life)
-
+        # Draw all the lives in our group simultaneously
         self.lives.draw(self.screen)
 
+        # Use the same process from above to draw lives left to screen to draw bombs available to screen
+        self.bomb_lives = pygame.sprite.Group()
+        for bomb_number in range(self.settings.bombs_available):
+            bomb_life = BombLives(self)
+            # Dimensions for offset/ spacing away from lives left will be attained by trial and error
+            bomb_life.rect.x = 280 + (bomb_life.rect.width + 10) * bomb_number
+            bomb_life.rect.y = -10
+            self.bomb_lives.add(bomb_life)
 
+        self.bomb_lives.draw(self.screen)
 
-        # Draw a red backdrop if the game has not started yet
+        # Again, using the same process from above to draw friendly missiles available to screen
+        self.friendly_missile_lives = pygame.sprite.Group()
+        for missile_number in range(self.settings.friendly_missiles_available):
+            missile_life = FriendlyMissileLives(self)
+            missile_life.rect.x = 590 + (missile_life.rect.width + 10) * missile_number
+            missile_life.rect.y = -10
+            self.friendly_missile_lives.add(missile_life)
+
+        self.friendly_missile_lives.draw(self.screen)
+
+        # Draw a black backdrop if the game has not started yet
         if not self.game_active:
             self.screen.fill((0, 0, 0))
 

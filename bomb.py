@@ -12,11 +12,11 @@ class Bomb(Sprite):
         self.settings = jet_fighter_game.settings
         self.screen = jet_fighter_game.screen
 
-        self.image = pygame.image.load('images/bomb_images/better_bomb.bmp')
+        self.image = pygame.image.load('images/bomb_images/bomb.png')
         pygame.Surface.set_colorkey(self.image, (255, 255, 255))
         pygame.Surface.set_colorkey(self.image, (238, 238, 238))
-        self.image = pygame.transform.scale(self.image, (30, 30))
-        self.image = pygame.transform.rotate(self.image, 270)
+        self.image = pygame.transform.scale(self.image, (40, 40))
+        #self.image = pygame.transform.rotate(self.image, 270)
         self.rect = self.image.get_rect()
 
         self.start_pos_x = jet_fighter_game.jet.rect.x
