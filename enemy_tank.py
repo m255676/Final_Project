@@ -22,26 +22,20 @@ class Enemy_Tank(Sprite):
         self.start_pos_y = self.screen_height - jet_fighter_game.ground.rect.height - 15
         self.rect.x = self.start_pos_x
 
-        self.tank_speed = 1.50
+        #self.tank_speed = 1.50
 
-    def update(self, time):
+    def update(self, time, tank_speed):
         """Move Tanks"""
-        self.move_tank(time)
+        self.move_tank(time, tank_speed)
         #collision = pygame.sprite.spritecollide(self, bombs, True)
 
-    def move_tank(self, time):
+    def move_tank(self, time, tank_speed):
         """Function to move tank"""
-        self.rect.x -= self.tank_speed
+        self.rect.x -= tank_speed
         self.rect.y = self.start_pos_y
         # Creating this Rect attribute so collision will run
         self.rect = pygame.Rect(self.rect.x, self.rect.y, self.rect.width, self.rect.height)
-        # Over time speed up the tank speed but max it out at a speed that makes game play relatively difficult
-        if (time % 500) == 0:
-            if self.tank_speed >= 3.0:
-                self.tank_speed = 3.0
-            else:
-                # Scale up the tank speed by some amount after every so ofter
-                self.tank_speed += 0.25
+
     def draw_tank(self):
         """Function to draw tank to screen"""
         self.screen.blit(self.image, self.rect)

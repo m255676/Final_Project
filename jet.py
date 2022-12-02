@@ -65,7 +65,7 @@ class Jet:
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
         if self.speeding_up:
-            self.jet_speed_x = 6
+            self.jet_speed_x = 7
             self.rect.x += self.jet_speed_x
         else:
             self.jet_speed_x = 3.0

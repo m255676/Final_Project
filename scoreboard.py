@@ -42,7 +42,7 @@ class Scoreboard:
         self.game_level_rect.x = self.game_level_txt_rect.x + self.game_level_txt_rect.width/2
 
         self.game_level_rect.y = self.game_level_txt_rect.height + 5
-        print(self.game_level_rect.center)
+
     def prep_score(self):
         """Turn the score into a rendered image."""
         # The dynamic integer is turned into a string so we may render it and then display it in our scoreboard

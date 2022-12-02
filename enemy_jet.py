@@ -50,12 +50,12 @@ class Enemy_Jet:
 
         # speed up the speed of the enemy jet over time until it reaches a max speed that makes the game reasonably difficult
         #   we evaluate the time from our main game loop counter thats passed into this method
-        if (time % 500) == 0:
+        if (time % 300) == 0:
             # Max speed out at 2.5
             if self.x_speed >= 4.0:
                 self.x_speed = 4.0
             else:
-                self.x_speed += 0.25
+                self.x_speed += 0.50
 
 
 

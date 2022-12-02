@@ -57,8 +57,9 @@ class JetFighterGame:
         self.pause_button = PauseButton(self, "Pause")
         self.play_again_button = PlayAgainButton(self, "Play Again")
         self.trigger_decrease = 20
-        self.make_new_tanks_trigger = 300
-        self.shoot_enemy_missile_trigger = 175
+        self.make_new_tanks_trigger = 200
+        self.shoot_enemy_missile_trigger = 185
+        self.enemy_tank_speed = 1.5
 
 
     def run_game(self):
@@ -82,7 +83,7 @@ class JetFighterGame:
 
                     # This will move the tanks
                     # Pass in counter so tanks will speed themselves up over time
-                    self.enemy_tanks.update(self.counter)
+                    self.enemy_tanks.update(self.counter, self.enemy_tank_speed)
 
                     # This will update the bombs in our sprite group
                     self.bombs.update()
@@ -103,10 +104,10 @@ class JetFighterGame:
                     # After certain time decrement the time it will take to make new tanks and shoot enemy missiles
                     # Doing this to speed up the frequency at which these events happen, speeding up game play
                     # This will only decrement to a certain amount to maintain reasonable playability
-                    if (self.counter % 500 == 0):
+                    if (self.counter % 600 == 0):
                         # make new tanks trigger can only reach this low
-                        if self.make_new_tanks_trigger <= 150:
-                            self.make_new_tanks_trigger = 150
+                        if self.make_new_tanks_trigger <= 100:
+                            self.make_new_tanks_trigger = 100
                         else:
                             self.make_new_tanks_trigger -= self.trigger_decrease
                         # shoot enemy missile trigger can only reach this low
@@ -115,16 +116,22 @@ class JetFighterGame:
                         else:
                             self.shoot_enemy_missile_trigger -= self.trigger_decrease
 
-                    # Every 500 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet
-                    # missile spawn frequency increases, so I will say that for every 10 times we speed up the game
-                    # this will be a new level
-                    # Set to 100 for testing
-                    if (self.counter % 500*10) == 0:
+                    # Every 600 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet
+                    # missile spawn frequency or speed increases, so I will say that for every time we speed
+                    # up the game this will be a new level
+                    if (self.counter % 600) == 0:
                         self.scoreboard.prep_game_level()
                         self.settings.game_level += 1
-                        print(f"self.settings: {self.settings.game_level}")
                         # With each level up a power up that grants and extra life will spawn and travel
                         # in at a cos curve shooting the power up grant you an additional life
+                    # Over time speed up the tank speed but max it out at a speed that makes game play relatively
+                    # difficult
+                    if (self.counter % 600) == 0:
+                        if self.enemy_tank_speed >= 4.0:
+                            self.enemy_tank_speed = 4.0
+                        else:
+                            # Scale up the tank speed by some amount after every so ofter
+                            self.enemy_tank_speed += .50
 
 
                     # update the missiles so they travel across the screen.
@@ -208,6 +215,7 @@ class JetFighterGame:
         # The play again button will reset the game and reset all game stats
         if self.lives_left <= 0 and play_again_button_clicked:
             # Empty Bomb, Missiles, and Tank List and Reset Jet positions
+            # Reset enemy jet speed and reset enemy tank speed since it will have incremented from last game play
             # Reset the counter and all game stats:
             self.settings.lives_left = 1
             self.settings.game_level = 1
@@ -218,6 +226,8 @@ class JetFighterGame:
             self.bombs.empty()
             self.counter = 0
             self.enemy_jet.reset_jet()
+            self.enemy_jet.x_speed = 1.5
+            self.enemy_tank_speed = 1.5
             # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the
             # game level
             self.settings.tank_hit_points = 50
