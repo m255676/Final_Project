@@ -6,7 +6,7 @@ class Settings():
         self.screen_width = 1200
         self.screen_height = 600
         self.ground_height = self.screen_height / 10
-        self.lives_left = 1
+        self.lives_left = 3
         self.score = 0
         self.high_score = 0
         self.game_level = 1

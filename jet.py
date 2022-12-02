@@ -2,11 +2,12 @@ import pygame
 from pygame.sprite import Sprite
 from time import sleep
 
-class Jet:
+class Jet(Sprite):
     """Class to manage Jet gameplay"""
     def __init__(self, jet_fighter_game):
         """Initialize the jet and set its starting position"""
-        # Pass in the screen dimensions from jet fighter game
+        super().__init__()
+        # Pass in the screen dimensions and other necessary functionality from jet fighter game
         self.screen = jet_fighter_game.screen
         self.settings = jet_fighter_game.settings
         self.scoreboard = jet_fighter_game.scoreboard

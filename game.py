@@ -21,10 +21,7 @@ class JetFighterGame:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
-
-
         self.lives_left = self.settings.lives_left
-
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
         pygame.display.set_caption("Jet Fighter Game")
         self.back_ground = pygame.image.load('images/blue_sky_background.bmp')
@@ -43,8 +40,6 @@ class JetFighterGame:
         self.enemy_jet = Enemy_Jet(self)
         self.ground = Ground(self)
 
-
-
         self.bombs = pygame.sprite.Group()
         self.enemy_tanks = pygame.sprite.Group()
         self.enemy_missiles = pygame.sprite.Group()
@@ -59,6 +54,8 @@ class JetFighterGame:
         self.trigger_decrease = 20
         self.make_new_tanks_trigger = 200
         self.shoot_enemy_missile_trigger = 185
+        # Enemy tank speed is something I define in the main game loop and adjust over time, to make the game more
+        # difficult over time so for every new tank to be created with this speed this will be passed into each new tank
         self.enemy_tank_speed = 1.5
 
 
@@ -132,7 +129,6 @@ class JetFighterGame:
                         else:
                             # Scale up the tank speed by some amount after every so ofter
                             self.enemy_tank_speed += .50
-
 
                     # update the missiles so they travel across the screen.
                     self.enemy_missiles.update()
@@ -217,7 +213,7 @@ class JetFighterGame:
             # Empty Bomb, Missiles, and Tank List and Reset Jet positions
             # Reset enemy jet speed and reset enemy tank speed since it will have incremented from last game play
             # Reset the counter and all game stats:
-            self.settings.lives_left = 1
+            self.settings.lives_left = 3
             self.settings.game_level = 1
             self.jet._reset_jet()
             self.friendly_missiles.empty()
@@ -236,11 +232,12 @@ class JetFighterGame:
             self.scoreboard.check_high_score()
             # Once I've checked the score I reset the current stats to their respective starting value
             self.stats.reset_stats()
-            # Call the prep score and prep high score functions so the score, high score, and level is displayed at the
-            # start of the game
+            # Call the scoreboard prep functions to display: score, high score, level, lives left, missiles left, and
+            # bombs left at the start of the game
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
             self.scoreboard.prep_game_level()
+            self.scoreboard.prep_lives_left()
 
             self.run_game()
 
