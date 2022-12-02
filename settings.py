@@ -9,6 +9,7 @@ class Settings():
         self.lives_left = 1
         self.score = 0
         self.high_score = 0
+        self.game_level = 1
         self.bg_color = (215, 215, 215)
 
         # Points received for dropping a bomb on an enemy tank:

@@ -46,7 +46,6 @@ class Enemy_Jet:
         # Check if the friendly missiles have collided with the enemy, if so restart enemy plane at edge of screen
         missile_jet_collision = pygame.sprite.spritecollide(self, friendly_missiles, True)
         if missile_jet_collision:
-            print("Collision")
             self.reset_jet()
 
         # speed up the speed of the enemy jet over time until it reaches a max speed that makes the game reasonably difficult

@@ -37,7 +37,6 @@ class JetFighterGame:
         # Create instance of Gamestats and Scoreboard in order to use their functionality
         self.stats = GameStats(self)
         self.scoreboard = Scoreboard(self)
-        self.game_level = 1
         self.score_multiplier = self.settings.score_multiplier
 
         self.jet = Jet(self)
@@ -77,7 +76,6 @@ class JetFighterGame:
                     # Always set this to the adjusted number in settings
                     self.lives_left = self.settings.lives_left
                     if self.lives_left <=0:
-                        print("All out of lives")
                         self._end_game()
                         break
                     self._check_events()
@@ -118,12 +116,13 @@ class JetFighterGame:
                             self.shoot_enemy_missile_trigger -= self.trigger_decrease
 
                     # Every 500 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet
-                    # missile spawn frequency increases so I will say that for every 10 times we speed up the game
+                    # missile spawn frequency increases, so I will say that for every 10 times we speed up the game
                     # this will be a new level
+                    # Set to 100 for testing
                     if (self.counter % 500*10) == 0:
-                        self.game_level += 1
-                        print(self.game_level)
-                        print(self.settings.tank_hit_points)
+                        self.scoreboard.prep_game_level()
+                        self.settings.game_level += 1
+                        print(f"self.settings: {self.settings.game_level}")
                         # With each level up a power up that grants and extra life will spawn and travel
                         # in at a cos curve shooting the power up grant you an additional life
 
@@ -209,8 +208,9 @@ class JetFighterGame:
         # The play again button will reset the game and reset all game stats
         if self.lives_left <= 0 and play_again_button_clicked:
             # Empty Bomb, Missiles, and Tank List and Reset Jet positions
-            # Also reset the counter and all jet stats
+            # Reset the counter and all game stats:
             self.settings.lives_left = 1
+            self.settings.game_level = 1
             self.jet._reset_jet()
             self.friendly_missiles.empty()
             self.enemy_missiles.empty()
@@ -226,10 +226,11 @@ class JetFighterGame:
             self.scoreboard.check_high_score()
             # Once I've checked the score I reset the current stats to their respective starting value
             self.stats.reset_stats()
-            # Call the prep score and prep high score functions so the score and high score is displayed at the start
-            # of the game
+            # Call the prep score and prep high score functions so the score, high score, and level is displayed at the
+            # start of the game
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
+            self.scoreboard.prep_game_level()
 
             self.run_game()
 

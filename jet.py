@@ -46,9 +46,7 @@ class Jet:
             self._reset_jet()
             # Subtract one life from the number of lives left
             self.settings.lives_left -= 1
-            print("Ship Hit")
-            print(f"In jet: {self.settings.lives_left}")
-            # Make Explosion at collision
+
         bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
         if bomb_tank_collision:
             self.stats.score += self.settings.tank_hit_points

@@ -1,7 +1,7 @@
 import pygame.font
 
 class Scoreboard:
-    """Class to report scoring information."""
+    """Class to report scoring information: Level, High Score, Current Score"""
 
     def __init__(self, jet_fighter_game):
         """Initialize scorekeeping attributes"""
@@ -15,10 +15,34 @@ class Scoreboard:
         self.bg_color = self.settings.bg_color
         self.font = pygame.font.SysFont(None, 32)
 
-        # Prepare the initial score image.
+        # Prepare the initial score image and the current level image
         self.prep_score()
         self.prep_high_score()
+        self.prep_game_level()
 
+    def prep_game_level(self):
+        """Turn the game level into a rendered image."""
+        # The dynamic integer is turned into a string so we may render it and then display it in our scoreboard
+        game_level_str = "{:,}".format(self.settings.game_level)
+        self.game_level_image = self.font.render(game_level_str, True, self.text_color, None)
+
+        # Text that game level will go under, reads "CURRENT LEVEL"
+        game_level_txt = "LEVEL"
+        self.game_level_txt_image = self.font.render(game_level_txt, True, self.text_color, None)
+
+        # Display the score at the top right of the screen underneath the lettering "CURRENT SCORE".
+        self.game_level_rect = self.game_level_image.get_rect()
+        self.game_level_txt_rect = self.game_level_txt_image.get_rect()
+
+        # Set the location of the score text and the score itself
+        # Location needs to just offset from high score since high score is to its right on the screen - offset 20 pixel
+        self.game_level_txt_rect.right = self.high_score_txt_rect.x - 30
+
+        # Center under game level text
+        self.game_level_rect.x = self.game_level_txt_rect.x + self.game_level_txt_rect.width/2
+
+        self.game_level_rect.y = self.game_level_txt_rect.height + 5
+        print(self.game_level_rect.center)
     def prep_score(self):
         """Turn the score into a rendered image."""
         # The dynamic integer is turned into a string so we may render it and then display it in our scoreboard
@@ -28,7 +52,7 @@ class Scoreboard:
         self.score_image = self.font.render(score_str, True, self.text_color, None)
 
         # Text that score will go under, reads "CURRENT SCORE:"
-        score_txt = "CURRENT SCORE"
+        score_txt = "SCORE"
         self.score_txt_image = self.font.render(score_txt, True, self.text_color, None)
 
         # Display the score at the top right of the screen underneath the lettering "CURRENT SCORE".
@@ -50,7 +74,7 @@ class Scoreboard:
 
         # Have "high score" set 20 pixels to the left of current score, even in height with the text of "current score"
         self.high_score_txt_rect = self.high_score_txt_image.get_rect()
-        self.high_score_txt_rect.x = self.score_txt_rect.x - self.high_score_txt_rect.width - 20
+        self.high_score_txt_rect.x = self.score_txt_rect.x - self.high_score_txt_rect.width - 30
         self.high_score_txt_rect.top = self.score_txt_rect.top
 
         # Make the high score a string then make that string an image
@@ -72,6 +96,10 @@ class Scoreboard:
         # Draw "High Score" and the high score underneath it
         self.screen.blit(self.high_score_txt_image, self.high_score_txt_rect)
         self.screen.blit(self.high_score_image, self.high_score_rect)
+
+        # Draw "Current Level" and level underneath it
+        self.screen.blit(self.game_level_txt_image, self.game_level_txt_rect)
+        self.screen.blit(self.game_level_image, self.game_level_rect)
 
     def check_high_score(self):
         """Check to see if there's a new high score."""

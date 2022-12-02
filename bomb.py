@@ -45,7 +45,6 @@ class Bomb(Sprite):
         self.rect.y += self.bomb_vertical_speed
         self.bomb_vertical_speed += self.bomb_vertical_speed * .025
 
-
     def _check_ground_collision(self):
         """Insert Explosion image if bomb hits ground and delete bomb"""
         # Threw in arbitrary number at end of equation to try and account for tanks being offset on ground for 3d effect
