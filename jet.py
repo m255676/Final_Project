@@ -64,6 +64,8 @@ class Jet:
         # Check if the jet is at the right edge, if it is reset to the left side before flying right
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
+            # After we reset the jet also reset our bombs and missiles available
+            self.settings.bombs_available = 5
         if self.speeding_up:
             self.jet_speed_x = 7
             self.rect.x += self.jet_speed_x

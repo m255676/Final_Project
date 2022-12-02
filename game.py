@@ -182,7 +182,12 @@ class JetFighterGame:
         elif event.key == pygame.K_DOWN:
             self.jet.moving_down = True
         elif event.key == pygame.K_SPACE:
-            self._drop_bomb()
+            # Make sure we can only drop a bomb if there are any available
+            if self.settings.bombs_available >= 1:
+                self._drop_bomb()
+                # After dropping a bomb remove one bomb from our available bombs - availability resets when jet does
+                self.settings.bombs_available -= 1
+                print(self.settings.bombs_available)
         elif event.key == pygame.K_RIGHT:
             self.jet.speeding_up = True
         elif event.key == pygame.K_LEFT:
