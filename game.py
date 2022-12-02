@@ -13,6 +13,7 @@ from button import PauseButton
 from button import PlayAgainButton
 from game_stats import GameStats
 from scoreboard import Scoreboard
+from lives import Lives
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -64,6 +65,7 @@ class JetFighterGame:
         # Need to make an instance of the first tank to run before the counter starts making new tanks
         first_tank = Enemy_Tank(self)
         self.enemy_tanks.add(first_tank)
+
         while not self.game_active:
             self._check_events()
             self._update_screen()
@@ -224,6 +226,9 @@ class JetFighterGame:
             self.enemy_jet.reset_jet()
             self.enemy_jet.x_speed = 1.5
             self.enemy_tank_speed = 1.5
+            # Need to reset the triggers that speed up during the game
+            self.make_new_tanks_trigger = 200
+            self.shoot_enemy_missile_trigger = 185
             # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the
             # game level
             self.settings.tank_hit_points = 50
@@ -232,12 +237,10 @@ class JetFighterGame:
             self.scoreboard.check_high_score()
             # Once I've checked the score I reset the current stats to their respective starting value
             self.stats.reset_stats()
-            # Call the scoreboard prep functions to display: score, high score, level, lives left, missiles left, and
-            # bombs left at the start of the game
+            # Call the scoreboard prep functions to display: score, high score, and level at the start of the game
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
             self.scoreboard.prep_game_level()
-            self.scoreboard.prep_lives_left()
 
             self.run_game()
 
@@ -305,6 +308,24 @@ class JetFighterGame:
 
         for bomb in self.bombs.sprites():
             bomb.draw_bomb()
+
+        # Make an empty group list that will hold the correct number of our lives
+        # I'm using the group method to do this so that I can draw the whole group at once
+        self.lives = pygame.sprite.Group()
+        for life_number in range(self.settings.lives_left):
+            life = Lives(self)
+            # The pause button has a width of 80; Accounting for this, I offset the group by 30 pixels
+            # and set their height to 0 so that the group can be seen on the screen next to the pause button
+            # I will have to account for the width of each life relative the how many lives there are in the group
+            # to do this I will place the new x value for the new life relative to its number in the group
+            life.rect.x = 80 + 10 + (life.rect.width + 10)* life_number
+
+            life.rect.y = -10
+            self.lives.add(life)
+
+        self.lives.draw(self.screen)
+
+
 
         # Draw a red backdrop if the game has not started yet
         if not self.game_active:

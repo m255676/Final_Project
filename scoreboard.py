@@ -1,6 +1,5 @@
 import pygame.font
 from pygame.sprite import Group
-from jet import Jet
 
 class Scoreboard:
     """Class to report scoring information: Level, High Score, Current Score"""
@@ -22,21 +21,6 @@ class Scoreboard:
         self.prep_score()
         self.prep_high_score()
         self.prep_game_level()
-        self.prep_lives_left()
-
-    def prep_lives_left(self):
-        """Show how many lives are left"""
-        # Make an empty sprite group that will house a jet for each number of lives the player has left
-        # Then we will set each jet's position and then draw the group to the screen
-        self.jets_left = Group()
-        for jet_number in range(self.settings.lives_left):
-            jet = Jet(self.jet_fighter_game)
-            # Pause button is 80 pixels wide - I need to offset that distance plus account for the spacing of each jet
-            # in order to display the next jet until all the jets are placed for each life left
-            # This is why this is in a for loop, so that I can offset each jet relative to its place in lives left:
-            jet.rect.x = 80 + 30 + jet_number * jet.rect.width
-            jet.rect.y = 10
-            self.jets_left.add(jet)
 
     def prep_game_level(self):
         """Turn the game level into a rendered image."""
@@ -118,10 +102,6 @@ class Scoreboard:
         # Draw "Current Level" and level underneath it
         self.screen.blit(self.game_level_txt_image, self.game_level_txt_rect)
         self.screen.blit(self.game_level_image, self.game_level_rect)
-
-        # Draw the jets/lives left
-        # Because jets left is a sprite group I can use the draw method
-        self.jets_left.draw(self.screen)
 
     def check_high_score(self):
         """Check to see if there's a new high score."""
