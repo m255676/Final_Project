@@ -6,6 +6,7 @@ class GameStats:
         self.settings = jet_fighter_game.settings
         self.reset_stats()
         self.score = self.settings.score
+        self.high_score = self.settings.high_score
 
     def reset_stats(self):
         """Initialize statistics that can change during the game."""

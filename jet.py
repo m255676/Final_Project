@@ -9,6 +9,9 @@ class Jet:
         # Pass in the screen dimensions from jet fighter game
         self.screen = jet_fighter_game.screen
         self.settings = jet_fighter_game.settings
+        self.scoreboard = jet_fighter_game.scoreboard
+        self.stats = jet_fighter_game.stats
+        self.score_multiplier = jet_fighter_game.score_multiplier
 
         # Use the get_rect() method so we can access the screen dimensions and use them later
         self.screen_rect = jet_fighter_game.screen.get_rect()
@@ -33,7 +36,7 @@ class Jet:
         self.jet_speed_x = 3.0
         self.acceleration = .005
 
-    def move_jet(self, enemy_missiles, friendly_missiles, bombs, tanks):
+    def move_jet(self, enemy_missiles, friendly_missiles, bombs, tanks, counter):
         """Ques the horizontal and vertical movements, so they happen nearly simultaneously"""
         missiles_collided = pygame.sprite.groupcollide(enemy_missiles, friendly_missiles, True, True)
         missile_jet_collision = pygame.sprite.spritecollide(self, enemy_missiles, True)
@@ -47,10 +50,17 @@ class Jet:
             print(f"In jet: {self.settings.lives_left}")
             # Make Explosion at collision
         bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
-        #print(bomb_tank_collision)
+        if bomb_tank_collision:
+            self.stats.score += self.settings.tank_hit_points
+            self.scoreboard.prep_score()
+            self.scoreboard.prep_high_score()
         self.fly_right()
         self.increase_altitude()
         self.decrease_altitude()
+        # Increase the value added to the score at the same rate the levels change so that the further in the game you advance the more you can score
+        if (counter % 500 * 10) == 0:
+            self.settings.tank_hit_points = self.settings.tank_hit_points * self.score_multiplier
+
     def fly_right(self):
         """Method that will move the jet rightward on the screen"""
         # Check if the jet is at the right edge, if it is reset to the left side before flying right

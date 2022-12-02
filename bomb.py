@@ -43,10 +43,7 @@ class Bomb(Sprite):
     def free_fall(self):
         """Update the self.rect.x and y to create free fall effect"""
         self.rect.y += self.bomb_vertical_speed
-
-    def _check_tank_collision(self, tanks):
-        """Tank collision check"""
-        tank_collision = pygame.sprite.spritecollide(self, tanks, True)
+        self.bomb_vertical_speed += self.bomb_vertical_speed * .025
 
 
     def _check_ground_collision(self):
@@ -62,7 +59,6 @@ class Bomb(Sprite):
     def update(self):
         """Call Fall and Check Ground or Tank Collisions"""
         self._check_ground_collision()
-        #self._check_tank_collision(tanks)
         self.free_fall()
 
     def draw_bomb(self):

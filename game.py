@@ -12,8 +12,7 @@ from button import PlayButton
 from button import PauseButton
 from button import PlayAgainButton
 from game_stats import GameStats
-import time
-import math
+from scoreboard import Scoreboard
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -22,7 +21,8 @@ class JetFighterGame:
         pygame.init()
         self.clock = pygame.time.Clock()
         self.settings = Settings()
-        self.stats = GameStats(self)
+
+
         self.lives_left = self.settings.lives_left
 
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
@@ -33,9 +33,18 @@ class JetFighterGame:
         self.loop_speed = 80
         self.counter = 0
 
+        # The following have to be initialized before running jet and enemy_jet in order for the game logic to work
+        # Create instance of Gamestats and Scoreboard in order to use their functionality
+        self.stats = GameStats(self)
+        self.scoreboard = Scoreboard(self)
+        self.game_level = 1
+        self.score_multiplier = self.settings.score_multiplier
+
         self.jet = Jet(self)
         self.enemy_jet = Enemy_Jet(self)
         self.ground = Ground(self)
+
+
 
         self.bombs = pygame.sprite.Group()
         self.enemy_tanks = pygame.sprite.Group()
@@ -52,7 +61,6 @@ class JetFighterGame:
         self.make_new_tanks_trigger = 300
         self.shoot_enemy_missile_trigger = 175
 
-        self.game_level = 1
 
     def run_game(self):
         """This is the main loop for the game"""
@@ -115,6 +123,7 @@ class JetFighterGame:
                     if (self.counter % 500*10) == 0:
                         self.game_level += 1
                         print(self.game_level)
+                        print(self.settings.tank_hit_points)
                         # With each level up a power up that grants and extra life will spawn and travel in at a cos curve
                         #   shooting the power up grant you an additional life
 
@@ -125,7 +134,8 @@ class JetFighterGame:
 
                     # This will call the jet movement functions for each jet passing in the neccessary groups to detect for collisions
                     # between game elements (there is no particular reason most of this evaluation takes place in the jet move function)
-                    self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks)
+                    # Also pass in counter so that the score multiplier is incremented based on game level and time
+                    self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks, self.counter)
                     self.enemy_jet.flight(self.counter, self.friendly_missiles)
 
                     # Control FPS
@@ -207,6 +217,13 @@ class JetFighterGame:
             self.bombs.empty()
             self.counter = 0
             self.enemy_jet.reset_jet()
+            # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the game level
+            self.settings.tank_hit_points = 50
+            self.scoreboard.check_high_score()
+            self.stats.reset_stats()
+            self.scoreboard.prep_score()
+            self.scoreboard.prep_high_score()
+
             self.run_game()
 
     def _check_keyup_events(self, event):
@@ -245,7 +262,7 @@ class JetFighterGame:
         """Run until play again button is clicked or game is exited"""
         while True:
             self.screen.fill((255, 0, 0))
-            self.font = pygame.font.SysFont(None, 54)
+            self.font = pygame.font.SysFont(None, 72)
             self.img = self.font.render(f"GAME OVER", True, (230, 230, 230))
             self.img_rect = self.img.get_rect()
             self.img_rect.center = (self.screen.get_rect().width/2, self.screen.get_rect().height/2 - 90)
@@ -284,6 +301,9 @@ class JetFighterGame:
 
         # Draw the pause button
         self.pause_button.draw_button()
+
+        # Draw the scoreboard to the screen
+        self.scoreboard.show_score()
 
         # Makes the most recently drawn screen visible
         pygame.display.flip()
