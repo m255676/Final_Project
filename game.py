@@ -16,6 +16,7 @@ from scoreboard import Scoreboard
 from lives import Lives
 from bomb_lives import BombLives
 from friendly_missile_lives import FriendlyMissileLives
+from time import sleep
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -26,11 +27,15 @@ class JetFighterGame:
         self.settings = Settings()
         self.lives_left = self.settings.lives_left
         self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
-        pygame.display.set_caption("Jet Fighter Game")
+        pygame.display.set_caption("JET BOMBER !")
         self.back_ground = pygame.image.load('images/blue_sky_background.bmp')
         self.back_ground = pygame.transform.scale(self.back_ground, (self.settings.screen_width, self.settings.screen_height))
 
+        # This will be passed into our clock.tick to control the game fps
         self.loop_speed = 80
+
+        # The counter is an integral element of the game, it will determine how frequently enemy tanks are spawned,
+        # enemy missiles shot, moving the sine path of the enemy jet, and the leveling up of the game
         self.counter = 0
 
         # The following have to be initialized before running jet and enemy_jet in order for the game logic to work
@@ -77,19 +82,19 @@ class JetFighterGame:
                 if not self.game_paused:
                     # Always set this to the adjusted number in settings
                     self.lives_left = self.settings.lives_left
-                    if self.lives_left <0:
+                    if self.lives_left < 0:
+                        # Pause game briefly before cueing game over screen
+                        sleep(.75)
                         self._end_game()
                         break
                     self._check_events()
 
-                    # This will move the tanks
-                    # Pass in counter so tanks will speed themselves up over time
-                    self.enemy_tanks.update(self.counter, self.enemy_tank_speed)
+                    # This will move the tanks - pass in the speed each tank should be at relative to the level of the
+                    # game - tank speed adjusted below every 600 ms - every 600 ms is also a new level
+                    self.enemy_tanks.update(self.enemy_tank_speed)
 
                     # This will update the bombs in our sprite group
                     self.bombs.update()
-                    # Check Ground Collisions for bombs
-                    self._check_ground_collision()
 
                     # Track Time using a counter
                     self.counter += 1
@@ -116,7 +121,6 @@ class JetFighterGame:
                             self.shoot_enemy_missile_trigger = 100
                         else:
                             self.shoot_enemy_missile_trigger -= self.trigger_decrease
-
                     # Every 600 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet
                     # missile spawn frequency or speed increases, so I will say that for every time we speed
                     # up the game this will be a new level
@@ -127,6 +131,9 @@ class JetFighterGame:
                         # in at a cos curve shooting the power up grant you an additional life
                     # Over time speed up the tank speed but max it out at a speed that makes game play relatively
                     # difficult
+                    # I am adjusting the tank speed outside the tank class so that I can pass in the tank's speed
+                    # so that the tank's start at the speed they should start at, otherwise they would start at the
+                    # lowest tank speed and then increase independently over time
                     if (self.counter % 600) == 0:
                         if self.enemy_tank_speed >= 4.0:
                             self.enemy_tank_speed = 4.0
@@ -288,12 +295,12 @@ class JetFighterGame:
         """Check if the bomb's ground collision flag is true and delete bomb if it is"""
         for bomb in self.bombs.sprites():
             if bomb.ground_collision:
-                bomb.kill()
+                pass
 
     def _end_game(self):
         """Run until play again button is clicked or game is exited"""
         while True:
-            self.screen.fill((255, 0, 0))
+            self.screen.fill((170, 50, 50))
             self.font = pygame.font.SysFont(None, 72)
             self.img = self.font.render(f"GAME OVER", True, (230, 230, 230))
             self.img_rect = self.img.get_rect()
@@ -360,9 +367,11 @@ class JetFighterGame:
 
         self.friendly_missile_lives.draw(self.screen)
 
-        # Draw a black backdrop if the game has not started yet
+        # Draw a the start screen if the game has not started yet
         if not self.game_active:
-            self.screen.fill((0, 0, 0))
+            start_screen = pygame.image.load('images/start_screen.png')
+            start_screen = pygame.transform.scale(start_screen, (self.settings.screen_width, self.settings.screen_height))
+            self.screen.blit(start_screen, (0,0))
 
         # Draw the play button if the game is not active
         if not self.game_active:

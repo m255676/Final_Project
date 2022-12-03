@@ -33,6 +33,7 @@ class Jet:
         self.moving_down = False
         self.speeding_up = False
 
+        # This controls how fast our jet moves across the screen
         self.jet_speed_x = 3.0
         self.acceleration = .005
 
@@ -49,33 +50,45 @@ class Jet:
         elif self.settings.lives_left == 0:
             # Load the jet's new image
             self.image = pygame.image.load('images/jet_images/AEG_CIV_death_1.png').convert_alpha()
-            self.image = pygame.transform.scale(self.image, (60, 60))
+            # This image appears to be scaled differently so I'm making it larger so that the observable
+            # jet size is consistent
+            self.image = pygame.transform.scale(self.image, (70, 70))
 
     def move_jet(self, enemy_missiles, friendly_missiles, bombs, tanks, counter):
         """Ques the horizontal and vertical movements, so they happen nearly simultaneously"""
         # Check lives left and adjust image based on lives left
         self._check_lives()
+        # Going to increment our tank_explosion counter so that we can set a time for the bomb tank explosion to be on
+        # the screen before the being deleted
         missiles_collided = pygame.sprite.groupcollide(enemy_missiles, friendly_missiles, True, True)
         missile_jet_collision = pygame.sprite.spritecollide(self, enemy_missiles, True)
         if missile_jet_collision:
-            # Pause the game if the enemy missile collided with the jet and reset the jet to the left side of the screen
-            #sleep(1.0)
-            #self._reset_jet()
             # Subtract one life from the number of lives left
+            # check lives above will set the plan's image depending on how many lives we have left
             self.settings.lives_left -= 1
 
         bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
         if bomb_tank_collision:
+            # When the bombs and tanks collide add the respective points to the score
+            # Then display this score by 'preping' the score and high score
             self.stats.score += self.settings.tank_hit_points
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
+            # Make an explosion when there is a collison between the bomb and tank
+            self._explosion()
+        # Move the jet to the right
         self.fly_right()
+        # Call increase or decrease functions which will run when their flags are set true- when the player moves
+        # the plane up or down using the arrow keys
         self.increase_altitude()
         self.decrease_altitude()
-        # Increase the value added to the score at the same rate the levels change so that the further in the game you advance the more you can score
+        # Increase the value added to the score at the same rate the levels change so that the further in the game you
+        # advance the more you can score
         if (counter % 500 * 10) == 0:
             self.settings.tank_hit_points = self.settings.tank_hit_points * self.score_multiplier
-
+    def _explosion(self):
+        """This will reset the bomb's image to an explosion"""
+        # Because our t
     def fly_right(self):
         """Method that will move the jet rightward on the screen"""
         # Check if the jet is at the right edge, if it is reset to the left side before flying right
