@@ -144,14 +144,16 @@ class JetFighterGame:
                             self.enemy_tank_speed += .50
 
                     # update the missiles so they travel across the screen.
-                    self.enemy_missiles.update()
                     self.friendly_missiles.update()
+                    # Pass in friendly missiles to the enemy_missiles update function so that enemy missiles can
+                    # check for collisions with friendly missiles and explode on collision
+                    self.enemy_missiles.update(self.friendly_missiles)
 
                     # This will call the jet movement functions for each jet passing in the neccessary groups to
                     # detect for collisions between game elements (there is no particular reason most of this
                     # evaluation takes place in the jet move function)
                     # Also pass in counter so that the score multiplier is incremented based on game level and time
-                    self.jet.move_jet(self.enemy_missiles, self.friendly_missiles, self.bombs, self.enemy_tanks, self.counter)
+                    self.jet.move_jet(self.enemy_missiles, self.bombs, self.enemy_tanks, self.counter)
                     self.enemy_jet.flight(self.counter, self.friendly_missiles)
 
                     # Control FPS

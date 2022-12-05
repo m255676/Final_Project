@@ -54,20 +54,18 @@ class Jet:
             # jet size is consistent
             self.image = pygame.transform.scale(self.image, (70, 70))
 
-    def move_jet(self, enemy_missiles, friendly_missiles, bombs, tanks, counter):
+    def move_jet(self, enemy_missiles, bombs, tanks, counter):
         """Ques the horizontal and vertical movements, so they happen nearly simultaneously"""
         # Check lives left and adjust image based on lives left
         self._check_lives()
-        # Going to increment our tank_explosion counter so that we can set a time for the bomb tank explosion to be on
-        # the screen before the being deleted
-        missiles_collided = pygame.sprite.groupcollide(enemy_missiles, friendly_missiles, True, True)
+        # Check if we have collided with any enemy missiles, if so then delete the enemy missile
         missile_jet_collision = pygame.sprite.spritecollide(self, enemy_missiles, True)
         if missile_jet_collision:
-            # Subtract one life from the number of lives left
-            # check lives above will set the plan's image depending on how many lives we have left
+            # Subtract one life from the number of lives left if an enemy missile hit us
+            # check lives above will set the plane's image depending on how many lives we have left
             self.settings.lives_left -= 1
         # I am not going to delete the tanks or bombs here, I will do that in the bomb instance when it uses
-        # spritecollideany. I just want to evaluate a collison between bombs and tanks so I know to add to the score
+        # spritecollideany. I just want to evaluate a collision between bombs and tanks so I know to add to the score
         bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, False, False)
         if bomb_tank_collision:
             # When the bombs and tanks collide add the respective points to the score
