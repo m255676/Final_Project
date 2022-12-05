@@ -65,6 +65,8 @@ class Bomb(Sprite):
         # If the bomb did not hit the groud and did not hit a tank continue falling
         if not self.bomb_collided_with_ground and not self.bomb_collided_with_tank and self.continue_falling:
             self.rect.y += self.bomb_vertical_speed
+            # Increase the rate at which we increase our vertical speed - giving the effect of acceleration which
+            # simulates the effect of gravity
             self.bomb_vertical_speed += self.bomb_vertical_speed * 0.025
         # If the bomb hit the ground and not a tank then call the method that will turn the bomb into a ground explosion
         elif self.bomb_collided_with_ground and not self.bomb_collided_with_tank:

@@ -59,7 +59,7 @@ class JetFighterGame:
         self.game_active = False
         self.game_paused = False
 
-        self.play_button = PlayButton(self, "Single Player")
+        self.play_button = PlayButton(self, "Play Game")
         self.pause_button = PauseButton(self, "Pause")
         self.play_again_button = PlayAgainButton(self, "Play Again")
         self.trigger_decrease = 20
@@ -202,8 +202,13 @@ class JetFighterGame:
         if event.key == pygame.K_q:
             sys.exit()
         elif event.key == pygame.K_UP:
+            # When the up arrow is pressed set the flag that moves the jet up to true so jet flies upwards while the
+            # arrow is pressed
+            # Turn Flags back to false on key ups
             self.jet.moving_up = True
         elif event.key == pygame.K_DOWN:
+            # Same as above, move jet down using move down flag which is set to True while down arrow is pressed
+            # Turn flags back to flase on key ups
             self.jet.moving_down = True
         elif event.key == pygame.K_SPACE:
             # Make sure we can only drop a bomb if there are any available
@@ -212,6 +217,7 @@ class JetFighterGame:
                 # After dropping a bomb remove one bomb from our available bombs - availability resets when jet does
                 self.settings.bombs_available -= 1
         elif event.key == pygame.K_RIGHT:
+            # when the player presses the right key set the flag that changes our jet speed to True
             self.jet.speeding_up = True
         elif event.key == pygame.K_LEFT:
             # This will work the same way as dropping bombs in the check space-bar event above
@@ -260,6 +266,8 @@ class JetFighterGame:
             self.enemy_jet.reset_jet()
             self.enemy_jet.x_speed = 1.5
             self.enemy_tank_speed = 1.5
+            # Reset the power up so that its out of the screen view
+            self.power_up.take_out_of_view()
             # Need to reset the triggers that speed up during the game
             self.make_new_tanks_trigger = 200
             self.shoot_enemy_missile_trigger = 185

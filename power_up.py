@@ -23,7 +23,8 @@ class PowerUp:
 
         # I always want to start the enemy jet at its width away from the edge of the scree so it flies into view
         # and I want the y position to always be the random input
-        self.start_pos_x = jet_fighter_game.settings.screen_width + self.rect.width
+        # I also offset an additional 20 so that the sine curve will never be in sequence with the enemy jet
+        self.start_pos_x = jet_fighter_game.settings.screen_width + self.rect.width + 20
         self.start_pos_y = height
         self.rect.x = self.start_pos_x
         self.rect.y = self.start_pos_y
