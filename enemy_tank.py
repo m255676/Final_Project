@@ -31,7 +31,9 @@ class Enemy_Tank(Sprite):
 
     def move_tank(self, tank_speed):
         """Function to move tank"""
-        # Only move the tank if the
+        # If the tanks moves out of the screen delete it
+        if self.rect.x + self.rect.width <= 0:
+            self.kill()
         self.rect.x -= tank_speed
         self.rect.y = self.start_pos_y
         # Creating this Rect attribute so collision will run

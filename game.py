@@ -32,7 +32,7 @@ class JetFighterGame:
         self.back_ground = pygame.transform.scale(self.back_ground, (self.settings.screen_width, self.settings.screen_height))
 
         # This will be passed into our clock.tick to control the game fps
-        self.loop_speed = 80
+        self.loop_speed = 85
 
         # The counter is an integral element of the game, it will determine how frequently enemy tanks are spawned,
         # enemy missiles shot, moving the sine path of the enemy jet, and the leveling up of the game
@@ -93,8 +93,10 @@ class JetFighterGame:
                     # game - tank speed adjusted below every 600 ms - every 600 ms is also a new level
                     self.enemy_tanks.update(self.enemy_tank_speed)
 
-                    # This will update the bombs in our sprite group
-                    self.bombs.update()
+                    # This will update the bombs in our sprite group - pass in enemy tanks group so each bomb can
+                    # determine if it has collided with an enemy tank and needs to explode\
+
+                    self.bombs.update(self.enemy_tanks)
 
                     # Track Time using a counter
                     self.counter += 1

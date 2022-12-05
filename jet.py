@@ -46,7 +46,7 @@ class Jet:
         elif self.settings.lives_left == 1:
             # Load the jet's new image
             self.image = pygame.image.load('images/jet_images/Damaged_Jet_2_Transparent.png').convert_alpha()
-            self.image = pygame.transform.scale(self.image, (60, 60))
+            self.image = pygame.transform.scale(self.image, (55, 55))
         elif self.settings.lives_left == 0:
             # Load the jet's new image
             self.image = pygame.image.load('images/jet_images/AEG_CIV_death_1.png').convert_alpha()
@@ -66,16 +66,16 @@ class Jet:
             # Subtract one life from the number of lives left
             # check lives above will set the plan's image depending on how many lives we have left
             self.settings.lives_left -= 1
-
-        bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, True, True)
+        # I am not going to delete the tanks or bombs here, I will do that in the bomb instance when it uses
+        # spritecollideany. I just want to evaluate a collison between bombs and tanks so I know to add to the score
+        bomb_tank_collision = pygame.sprite.groupcollide(bombs, tanks, False, False)
         if bomb_tank_collision:
             # When the bombs and tanks collide add the respective points to the score
             # Then display this score by 'preping' the score and high score
             self.stats.score += self.settings.tank_hit_points
             self.scoreboard.prep_score()
             self.scoreboard.prep_high_score()
-            # Make an explosion when there is a collison between the bomb and tank
-            self._explosion()
+
         # Move the jet to the right
         self.fly_right()
         # Call increase or decrease functions which will run when their flags are set true- when the player moves
@@ -86,17 +86,15 @@ class Jet:
         # advance the more you can score
         if (counter % 500 * 10) == 0:
             self.settings.tank_hit_points = self.settings.tank_hit_points * self.score_multiplier
-    def _explosion(self):
-        """This will reset the bomb's image to an explosion"""
-        # Because our t
+
     def fly_right(self):
         """Method that will move the jet rightward on the screen"""
         # Check if the jet is at the right edge, if it is reset to the left side before flying right
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
             # After we reset the jet also reset our bombs and missiles available
-            self.settings.bombs_available = 5
-            self.settings.friendly_missiles_available = 4
+            self.settings.bombs_available = 3
+            self.settings.friendly_missiles_available = 3
 
         if self.speeding_up:
             self.jet_speed_x = 7

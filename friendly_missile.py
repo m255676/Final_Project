@@ -22,11 +22,15 @@ class Friendly_Missile(Sprite):
         self.rect.x = self.start_pos_x
         self.rect.y = self.start_pos_y
 
-        self.missile_speed = 5.0
+        self.missile_speed = 7.0
 
     def _move_missile(self):
         """Missile flies across the screen right to left"""
+        # If missile moves out of the screen delete it
+        if self.rect.x + self.rect.width <= 0:
+            self.kill()
         self.rect.x += self.missile_speed
+        # .005
         self.missile_speed += .005 * self.missile_speed
 
     def update(self):

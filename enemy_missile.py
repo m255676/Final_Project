@@ -26,6 +26,9 @@ class Enemy_Missile(Sprite):
 
     def _move_missile(self):
         """Missile flies across the screen right to left"""
+        # If the missile moves out of the screen delete it
+        if self.rect.x + self.rect.width <= 0:
+            self.kill()
         self.rect.x -= self.missile_speed
         self.missile_speed += .005 * self.missile_speed
 
