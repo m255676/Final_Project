@@ -60,7 +60,6 @@ class Enemy_Missile(Sprite):
         if self.friendly_missile_collision:
             self._explode()
             self.explosion_counter += 1
-            print(self.explosion_counter)
 
         else:
             # If the missile has not exploded then move it from right to left across the screen at our specified speed

@@ -17,6 +17,7 @@ from lives import Lives
 from bomb_lives import BombLives
 from friendly_missile_lives import FriendlyMissileLives
 from time import sleep
+from power_up import PowerUp
 
 class JetFighterGame:
     """Overall Class to manage game assests and behaviors"""
@@ -44,9 +45,11 @@ class JetFighterGame:
         self.scoreboard = Scoreboard(self)
         self.score_multiplier = self.settings.score_multiplier
 
+        # Intialize instances of classes used throughout the game
         self.jet = Jet(self)
         self.enemy_jet = Enemy_Jet(self)
         self.ground = Ground(self)
+        self.power_up = PowerUp(self, 300)
 
         self.bombs = pygame.sprite.Group()
         self.enemy_tanks = pygame.sprite.Group()
@@ -126,9 +129,12 @@ class JetFighterGame:
                     # Every 600 ms the tank movement speed, tank spawn speed, enemy jet movement speed, and enemy jet
                     # missile spawn frequency or speed increases, so I will say that for every time we speed
                     # up the game this will be a new level
+                    # Eveytime the game level's up bring the power up back into view so the player can hit it again to
+                    # back lives
                     if (self.counter % 600) == 0:
                         self.scoreboard.prep_game_level()
                         self.settings.game_level += 1
+                        self.power_up.reset_power_up()
                         # With each level up a power up that grants and extra life will spawn and travel
                         # in at a cos curve shooting the power up grant you an additional life
                     # Over time speed up the tank speed but max it out at a speed that makes game play relatively
@@ -148,6 +154,11 @@ class JetFighterGame:
                     # Pass in friendly missiles to the enemy_missiles update function so that enemy missiles can
                     # check for collisions with friendly missiles and explode on collision
                     self.enemy_missiles.update(self.friendly_missiles)
+
+                    # Call the powerup flight method and pass in the counter to run the cos path of the power up and
+                    # pass in friendly missiles so the power up knows when its been hit and therefore knows to add
+                    # one life to the lives left
+                    self.power_up.flight(self.counter, self.friendly_missiles)
 
                     # This will call the jet movement functions for each jet passing in the neccessary groups to
                     # detect for collisions between game elements (there is no particular reason most of this
@@ -253,7 +264,9 @@ class JetFighterGame:
             self.make_new_tanks_trigger = 200
             self.shoot_enemy_missile_trigger = 185
             # Reset available bombs
-            self.settings.bombs_available = 5
+            self.settings.bombs_available = 4
+            # Reset the missiles available
+            self.settings.friendly_missiles_available = 3
             # Have to reset the points awarded for hitting tanks as this number otherwise increases relative to the
             # game level
             self.settings.tank_hit_points = 50
@@ -319,9 +332,14 @@ class JetFighterGame:
     def _update_screen(self):
         """This method updates the screen"""
         self.screen.blit(self.back_ground, (0,0))
+        # Draw the ground, jet, enemy jet, and power up
         self.ground.blitme()
         self.jet.blitme()
         self.enemy_jet.blitme()
+        self.power_up.blitme()
+
+        # Draw all missiles, friendly missiles, enemy tanks, bombs, and explosions
+        # This for loop is set up this way so that it calls the draw function inside every class referenced in the index
         for enemy_missile in self.enemy_missiles.sprites():
             enemy_missile.draw_missile()
 
@@ -333,6 +351,14 @@ class JetFighterGame:
 
         for bomb in self.bombs.sprites():
             bomb.draw_bomb()
+
+        # Draw the explosions made in the enemy jet class when the enemy jet is hit by friendly missiles
+        for explosion in self.enemy_jet.new_explosions_group.sprites():
+            explosion.draw_explosion()
+
+        # Draw the explosions made in the power up class when the friendly missiles hit the power up
+        for explosion in self.power_up.new_explosions_group.sprites():
+            explosion.draw_explosion()
 
         # Make an empty group list that will hold the correct number of our lives
         # I'm using the group method to do this so that I can draw the whole group at once

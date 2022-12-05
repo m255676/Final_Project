@@ -39,6 +39,10 @@ class Jet:
 
     def _check_lives(self):
         """Function that checks the lives left and changes the image of the jet accordingly"""
+        if self.settings.lives_left == 3:
+            # Load the jets original image
+            self.image = pygame.image.load('images/jet_images/AEG_CIV_attack_1.bmp').convert_alpha()
+            self.image = pygame.transform.scale(self.image, (60, 60))
         if self.settings.lives_left == 2:
             # Load the jet's new image
             self.image = pygame.image.load('images/jet_images/Damaged_Jet_1_Transparent.png').convert_alpha()
@@ -91,7 +95,7 @@ class Jet:
         if self.rect.x > self.settings.screen_width:
             self._reset_jet()
             # After we reset the jet also reset our bombs and missiles available
-            self.settings.bombs_available = 3
+            self.settings.bombs_available = 4
             self.settings.friendly_missiles_available = 3
 
         if self.speeding_up:
